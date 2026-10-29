@@ -39,6 +39,7 @@
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
+  --color-signal-emerald: var(--signal-emerald);
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
@@ -49,24 +50,25 @@
 }
 
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
+  --background: #f2f4f5;
+  --foreground: #0b0b0c;
+  --card: #fff;
+  --card-foreground: #0b0b0c;
+  --popover: #fff;
+  --popover-foreground: #0b0b0c;
+  --primary: #5433eb;
+  --primary-foreground: #fff;
+  --secondary: #f2f4f5;
+  --secondary-foreground: #1a1a1c;
+  --muted: #f2f4f5;
+  --muted-foreground: #5f5c5b;
+  --accent: #f2f4f5;
+  --accent-foreground: #1a1a1c;
   --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
+  --border: #ebebeb;
+  --input: #ebebeb;
+  --ring: #5433eb;
+  --signal-emerald: #137a43;
   --chart-1: oklch(0.87 0 0);
   --chart-2: oklch(0.556 0 0);
   --chart-3: oklch(0.439 0 0);
@@ -127,4 +129,33 @@
   html {
     @apply font-sans;
   }
+  body {
+    letter-spacing: -0.011em;
+  }
+}
+
+.store-card {
+  background: var(--card);
+  border: 1px solid transparent;
+  border-radius: 28px;
+  box-shadow:
+    0 4px 6px -1px rgb(0 0 0 / 0.08),
+    0 2px 4px -2px rgb(0 0 0 / 0.08);
+  transition:
+    box-shadow 150ms ease,
+    transform 150ms ease;
+}
+
+.store-card:hover {
+  box-shadow:
+    0 10px 20px -6px rgb(0 0 0 / 0.12),
+    0 4px 8px -4px rgb(0 0 0 / 0.08);
+}
+
+.no-scrollbar {
+  scrollbar-width: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
 }

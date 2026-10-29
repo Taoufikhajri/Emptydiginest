@@ -1,8 +1,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // STATIC_EXPORT=1 writes plain HTML/CSS/JS to out/ for any static host; Docker uses standalone.
-  output: process.env.STATIC_EXPORT ? "export" : "standalone",
+  output: "standalone",
+  // Load database drivers from node_modules at runtime instead of bundling them (PGlite ships WASM files).
+  serverExternalPackages: ["@electric-sql/pglite", "pg"],
 };
 
 export default nextConfig;

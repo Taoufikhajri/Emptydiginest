@@ -7,6 +7,9 @@ node_modules/
 .next/
 out/
 /lumen-market-site.zip
+
+# Local embedded database (PGlite)
+.data/
 build/
 dist/
 

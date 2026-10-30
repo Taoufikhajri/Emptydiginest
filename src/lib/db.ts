@@ -25,6 +25,11 @@ async function createClient(): Promise<Queryable> {
   }
 
   // No DATABASE_URL: embedded Postgres stored on disk, for local development.
+  if (process.env.NODE_ENV === "production") {
+    console.warn(
+      "DATABASE_URL is not set: using the embedded database. Its data is lost on every redeploy; connect PostgreSQL.",
+    );
+  }
   const { PGlite } = await import("@electric-sql/pglite");
   const { mkdir } = await import("node:fs/promises");
   const dataDir = process.env.PGLITE_DIR ?? ".data/pglite";

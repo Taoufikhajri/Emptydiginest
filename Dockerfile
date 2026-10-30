@@ -89,9 +89,9 @@ ENV HOSTNAME="0.0.0.0"
 # Copy production assets
 COPY --from=builder --chown=node:node /app/public ./public
 
-# Set the correct permission for prerender cache
-RUN mkdir .next
-RUN chown node:node .next
+# Set the correct permission for prerender cache, and for the embedded database used when DATABASE_URL is unset
+RUN mkdir .next .data
+RUN chown node:node .next .data
 
 # Automatically leverage output traces to reduce image size
 # https://nextjs.org/docs/advanced-features/output-file-tracing

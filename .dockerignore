@@ -19,6 +19,9 @@ dist
 .env.local
 .env.*.local
 
+# Local embedded database
+.data
+
 # Editor / OS
 .vscode
 .idea

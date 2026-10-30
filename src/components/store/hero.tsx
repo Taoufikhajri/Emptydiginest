@@ -1,12 +1,24 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { ArrowRight, ChevronLeft, ChevronRight, RotateCcw } from "lucide-react";
 import type { HeroCardStyle } from "@/lib/settings-shared";
 import { cn } from "@/lib/utils";
+import { useCart, type CartItem } from "./cart-provider";
 
-export type HeroSlide = { key: string; title: string; detail: string; href: string };
+export type HeroSlide = {
+  key: string;
+  label: string;
+  title: string;
+  detail: string;
+  // Large detail text for prices; smaller for sentences.
+  largeDetail: boolean;
+  href: string;
+  // Set when clicking the card should add this product to the cart and open the cart.
+  cartItem?: Omit<CartItem, "quantity">;
+};
 
 export type HeroContent = {
   storeName: string;
@@ -36,6 +48,8 @@ const stackTransforms = [
 ];
 
 export function Hero({ slides, content }: { slides: HeroSlide[]; content: HeroContent }) {
+  const router = useRouter();
+  const { add } = useCart();
   const [active, setActive] = useState(0);
   const [paused, setPaused] = useState(false);
   const [introKey, setIntroKey] = useState(0);
@@ -98,6 +112,13 @@ export function Hero({ slides, content }: { slides: HeroSlide[]; content: HeroCo
                   href={slide.href}
                   tabIndex={depth === 0 ? 0 : -1}
                   aria-hidden={depth !== 0}
+                  aria-label={slide.cartItem ? `Add ${slide.cartItem.name} to cart` : undefined}
+                  onClick={(event) => {
+                    if (!slide.cartItem) return;
+                    event.preventDefault();
+                    add(slide.cartItem);
+                    router.push("/cart");
+                  }}
                   className="absolute inset-0 flex flex-col justify-between rounded-[calc(var(--store-radius)*0.8)] p-[6%] text-white shadow-[0_30px_60px_-20px_rgba(20,20,60,0.45)] transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]"
                   style={{
                     background: content.cardStyle === "brand" ? brandGradient(index) : gradients[index % gradients.length],
@@ -109,7 +130,7 @@ export function Hero({ slides, content }: { slides: HeroSlide[]; content: HeroCo
                 >
                   <div className="pointer-events-none absolute inset-0 rounded-[calc(var(--store-radius)*0.8)] bg-[linear-gradient(115deg,rgba(255,255,255,0.18)_0%,rgba(255,255,255,0)_40%)]" />
                   <span className="relative text-[11px] font-medium tracking-[0.25em] opacity-90 sm:text-sm">
-                    {content.storeName.toUpperCase()}
+                    {slide.label || content.storeName.toUpperCase()}
                   </span>
                   <div className="relative">
                     <div className="mb-4 h-[22%] min-h-8 w-[14%] min-w-10 rounded-md bg-[linear-gradient(135deg,#d9d9d9,#9a9a9a)] p-[3px] shadow-inner sm:mb-6">
@@ -120,7 +141,7 @@ export function Hero({ slides, content }: { slides: HeroSlide[]; content: HeroCo
                       </div>
                     </div>
                     <p className="text-sm leading-snug font-semibold sm:text-xl">{slide.title}</p>
-                    <p className={cn("mt-1 sm:mt-2", index === 0 ? "text-sm sm:text-lg" : "text-xl font-semibold sm:text-3xl")}>
+                    <p className={cn("mt-1 sm:mt-2", slide.largeDetail ? "text-xl font-semibold sm:text-3xl" : "text-sm sm:text-lg")}>
                       {slide.detail}
                     </p>
                   </div>

@@ -40,6 +40,22 @@ export const heroCardStyles = [
 ] as const;
 export type HeroCardStyle = (typeof heroCardStyles)[number]["id"];
 
+export const heroCardActions = [
+  { id: "cart", label: "Add to cart and open the cart" },
+  { id: "product", label: "Open the product page" },
+] as const;
+export type HeroCardAction = (typeof heroCardActions)[number]["id"];
+
+// One rotating card in the hero. Empty text fields fall back to the product (name, price) and the store name.
+export type HeroCard = {
+  productId: number | null;
+  label: string;
+  title: string;
+  detail: string;
+  action: HeroCardAction;
+};
+export const MAX_HERO_CARDS = 6;
+
 export const homeSections = [
   { id: "hero", label: "Hero", hint: "Big headline with the rotating product cards" },
   { id: "guarantee", label: "Guarantee & payment methods", hint: "\"Replaced or refunded\" block and the Pay with badges" },
@@ -63,6 +79,8 @@ export type StoreSettings = {
   heroTitleAccent: string;
   heroSubtitle: string;
   heroCardStyle: HeroCardStyle;
+  // Empty: the hero shows an intro card plus up to 4 featured products.
+  heroCards: HeroCard[];
   primaryColor: string;
   backgroundColor: string;
   font: FontId;
@@ -90,6 +108,7 @@ export const defaultSettings: StoreSettings = {
   heroTitleLead: "Tools for makers,",
   heroTitleAccent: "delivered instantly.",
   heroSubtitle: "Most orders arrive within seconds, on the order page and by email.",
+  heroCards: [],
   ...defaultDesign,
 };
 

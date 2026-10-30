@@ -7,8 +7,10 @@ import {
   cornerStyleIds,
   currencyCodes,
   fontIds,
+  heroCardActions,
   homeSections,
   isHexColor,
+  MAX_HERO_CARDS,
   luminance,
   saveLogo,
   saveSettings,
@@ -20,6 +22,18 @@ const MAX_LOGO_BYTES = 500 * 1024;
 const logoTypes = ["image/png", "image/jpeg", "image/webp", "image/gif", "image/svg+xml"];
 
 const hexColor = (label: string) => z.string().refine(isHexColor, `Pick a valid ${label}.`);
+
+const heroCardsSchema = z
+  .array(
+    z.object({
+      productId: z.number().int().positive().nullable(),
+      label: z.string().trim().max(40),
+      title: z.string().trim().max(80),
+      detail: z.string().trim().max(60),
+      action: z.enum(heroCardActions.map((action) => action.id) as ["cart", "product"]),
+    }),
+  )
+  .max(MAX_HERO_CARDS, `Use up to ${MAX_HERO_CARDS} hero cards.`);
 
 const settingsSchema = z.object({
   storeName: z.string().trim().min(1, "Enter a store name.").max(60),
@@ -60,8 +74,18 @@ export async function updateSettings(_state: AdminFormState, formData: FormData)
     if (logo.size > MAX_LOGO_BYTES) return { error: "The logo must be 500 KB or smaller." };
   }
 
+  let rawHeroCards: unknown;
+  try {
+    rawHeroCards = JSON.parse(String(formData.get("heroCards") ?? "[]"));
+  } catch {
+    return { error: "The hero cards couldn't be read. Reload the page and try again." };
+  }
+  const heroCards = heroCardsSchema.safeParse(rawHeroCards);
+  if (!heroCards.success) return { error: heroCards.error.issues[0].message };
+
   const settings: StoreSettings = {
     ...parsed.data,
+    heroCards: heroCards.data,
     binanceUsdtRate: parsed.data.binanceUsdtRate.replace(",", "."),
     primaryColor: parsed.data.primaryColor.toLowerCase(),
     backgroundColor: parsed.data.backgroundColor.toLowerCase(),

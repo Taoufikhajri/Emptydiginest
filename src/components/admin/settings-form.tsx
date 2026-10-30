@@ -15,17 +15,19 @@ import {
   type StoreSettings,
 } from "@/lib/settings-shared";
 import { cn } from "@/lib/utils";
+import { HeroCardsEditor, type HeroCardProduct } from "./hero-cards-editor";
 import { buttonClass, inputClass, secondaryButtonClass } from "./ui";
 
 type SettingsFormProps = {
   values: StoreSettings;
   logoUrl: string | null;
   envBinanceRate: string | null;
+  products: HeroCardProduct[];
 };
 
 const checkboxClass = "mt-0.5 size-4 shrink-0 accent-[var(--primary)]";
 
-export function SettingsForm({ values, logoUrl, envBinanceRate }: SettingsFormProps) {
+export function SettingsForm({ values, logoUrl, envBinanceRate, products }: SettingsFormProps) {
   const [state, action, pending] = useActionState(updateSettings, undefined);
   const [currency, setCurrency] = useState(values.currency);
   const [primaryColor, setPrimaryColor] = useState(values.primaryColor);
@@ -169,7 +171,7 @@ export function SettingsForm({ values, logoUrl, envBinanceRate }: SettingsFormPr
           )}
         </Section>
 
-        <Section title="Home page" description="Turn sections on or off and edit the headline.">
+        <Section title="Home page" description="Turn sections on or off, edit the headline and choose the hero cards.">
           <label className="block text-sm font-medium">
             Announcement bar <span className="font-normal text-muted-foreground">(thin banner above the header; leave empty to hide)</span>
             <input name="announcement" maxLength={200} defaultValue={values.announcement} placeholder="e.g. Spring sale: 20% off all templates" className={inputClass} />
@@ -200,6 +202,7 @@ export function SettingsForm({ values, logoUrl, envBinanceRate }: SettingsFormPr
             Hero subtitle
             <input name="heroSubtitle" maxLength={200} defaultValue={values.heroSubtitle} className={inputClass} />
           </label>
+          <HeroCardsEditor initialCards={values.heroCards} products={products} currency={values.currency} storeName={values.storeName} />
         </Section>
 
         <Section title="Design" description="Colors, font and corner style for the whole store.">

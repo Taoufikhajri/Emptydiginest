@@ -18,20 +18,58 @@ export default async function HomePage() {
   const { sections } = settings;
   const showcase = featured.length > 0 ? featured : all.slice(0, 8);
 
-  const slides: HeroSlide[] = [
-    {
-      key: "intro",
-      title: `${all.length} tools for makers and creators`,
-      detail: "Delivered automatically",
-      href: "/products",
-    },
-    ...showcase.slice(0, 4).map((product) => ({
-      key: product.slug,
-      title: product.name,
-      detail: formatPrice(product.priceCents, settings.currency),
-      href: `/products/${product.slug}`,
-    })),
-  ];
+  // Cards chosen in admin Settings; hidden or deleted products are skipped.
+  const chosenSlides = settings.heroCards.flatMap((card, index): HeroSlide[] => {
+    const product = card.productId ? all.find((item) => item.id === card.productId) : null;
+    if (card.productId && !product) return [];
+    if (!product) {
+      const title = card.title || "Browse the catalog";
+      return [{ key: `card-${index}`, label: card.label, title, detail: card.detail || "All products", largeDetail: false, href: "/products" }];
+    }
+    return [
+      {
+        key: `card-${index}`,
+        label: card.label,
+        title: card.title || product.name,
+        detail: card.detail || formatPrice(product.priceCents, settings.currency),
+        largeDetail: !card.detail,
+        href: `/products/${product.slug}`,
+        cartItem:
+          card.action === "cart"
+            ? {
+                productId: product.id,
+                slug: product.slug,
+                name: product.name,
+                priceCents: product.priceCents,
+                icon: product.icon,
+                iconColor: product.iconColor,
+              }
+            : undefined,
+      },
+    ];
+  });
+
+  const slides: HeroSlide[] =
+    chosenSlides.length > 0
+      ? chosenSlides
+      : [
+          {
+            key: "intro",
+            label: "",
+            title: `${all.length} tools for makers and creators`,
+            detail: "Delivered automatically",
+            largeDetail: false,
+            href: "/products",
+          },
+          ...showcase.slice(0, 4).map((product) => ({
+            key: product.slug,
+            label: "",
+            title: product.name,
+            detail: formatPrice(product.priceCents, settings.currency),
+            largeDetail: true,
+            href: `/products/${product.slug}`,
+          })),
+        ];
 
   return (
     <>

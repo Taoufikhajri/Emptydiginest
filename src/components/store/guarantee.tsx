@@ -1,8 +1,13 @@
 import Link from "next/link";
-import { ArrowRight, Bitcoin, Coins, DollarSign, Wallet } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 
-const paymentMethods = ["Bitcoin", "Ethereum", "USDT", "Binance Pay"];
-const paymentIcons = [Bitcoin, Coins, DollarSign, Wallet];
+// Official symbols, fetched from Brandfetch into public/payments.
+const paymentMethods = [
+  { name: "Bitcoin", logo: "/payments/bitcoin.svg" },
+  { name: "Ethereum", logo: "/payments/ethereum.svg" },
+  { name: "USDT", logo: "/payments/usdt.svg" },
+  { name: "Binance Pay", logo: "/payments/binance-pay.svg" },
+];
 
 export function Guarantee() {
   return (
@@ -39,18 +44,16 @@ export function Guarantee() {
         <div className="mt-10 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
           <span className="text-sm font-medium text-muted-foreground sm:me-3">Pay with</span>
           <div className="flex flex-wrap gap-3">
-            {paymentMethods.map((method, index) => {
-              const Icon = paymentIcons[index % paymentIcons.length];
-              return (
-                <span
-                  key={method}
-                  className="inline-flex h-12 items-center gap-2 rounded-2xl bg-card px-5 text-sm font-semibold text-foreground shadow-[0_1px_3px_rgba(0,0,0,0.06)]"
-                >
-                  <Icon className="size-4 text-muted-foreground" />
-                  {method}
-                </span>
-              );
-            })}
+            {paymentMethods.map((method) => (
+              <span
+                key={method.name}
+                className="inline-flex h-12 items-center gap-2 rounded-2xl bg-card px-5 text-sm font-semibold text-foreground shadow-[0_1px_3px_rgba(0,0,0,0.06)]"
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element -- tiny static SVGs, nothing to optimize */}
+                <img src={method.logo} alt="" className="size-5 object-contain" />
+                {method.name}
+              </span>
+            ))}
           </div>
         </div>
       </div>

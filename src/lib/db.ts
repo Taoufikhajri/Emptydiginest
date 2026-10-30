@@ -131,6 +131,13 @@ const schema = [
     unit_price_cents INTEGER NOT NULL,
     quantity INTEGER NOT NULL
   )`,
+  // Kept apart from products so product lists never load image data.
+  `CREATE TABLE IF NOT EXISTS product_images (
+    product_id INTEGER PRIMARY KEY REFERENCES products(id) ON DELETE CASCADE,
+    content_type TEXT NOT NULL,
+    data TEXT NOT NULL,
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+  )`,
   // A single row (id = 1): settings JSON plus the uploaded logo, stored as base64.
   `CREATE TABLE IF NOT EXISTS store_settings (
     id INTEGER PRIMARY KEY CHECK (id = 1),

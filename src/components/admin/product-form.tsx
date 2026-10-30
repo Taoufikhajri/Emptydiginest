@@ -1,9 +1,11 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState, useEffect, useState } from "react";
 import { Loader2 } from "lucide-react";
 import { saveProduct } from "@/app/actions/admin";
-import { DynamicIcon, iconNames } from "@/lib/icons";
+import { ProductVisual } from "@/components/product-visual";
+import { iconNames } from "@/lib/icons";
+import { imageAccept } from "@/lib/images";
 import { buttonClass, inputClass } from "./ui";
 
 export type ProductFormValues = {
@@ -14,6 +16,7 @@ export type ProductFormValues = {
   categoryId: number | null;
   icon: string;
   iconColor: string;
+  imageUrl: string | null;
   price: string;
   compareAt: string;
   features: string;
@@ -28,6 +31,19 @@ export function ProductForm({ values, categories, currency }: ProductFormProps) 
   const [state, action, pending] = useActionState(saveProduct, undefined);
   const [icon, setIcon] = useState(values.icon);
   const [color, setColor] = useState(values.iconColor);
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [removeImage, setRemoveImage] = useState(false);
+
+  useEffect(() => {
+    if (!imageFile) return;
+    const url = URL.createObjectURL(imageFile);
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- object URL must be created and revoked together
+    setImagePreview(url);
+    return () => URL.revokeObjectURL(url);
+  }, [imageFile]);
+
+  const shownImage = imageFile ? imagePreview : removeImage ? null : values.imageUrl;
 
   return (
     <form action={action} className="grid gap-6 xl:grid-cols-[1fr_320px]">
@@ -78,6 +94,36 @@ export function ProductForm({ values, categories, currency }: ProductFormProps) 
               ))}
             </select>
           </label>
+          <div className="flex items-start gap-3">
+            <span className="grid size-20 shrink-0 place-items-center overflow-hidden rounded-xl border border-border bg-secondary p-2">
+              <ProductVisual imageUrl={shownImage} icon={icon} iconColor={color} iconClassName="size-8" />
+            </span>
+            <div className="min-w-0 flex-1 space-y-2">
+              <label className="block text-sm font-medium">
+                Image <span className="font-normal text-muted-foreground">(PNG, JPG, WebP, GIF or SVG, up to 500 KB)</span>
+                <input
+                  name="image"
+                  type="file"
+                  accept={imageAccept}
+                  onChange={(event) => setImageFile(event.target.files?.[0] ?? null)}
+                  className="mt-1.5 block w-full text-xs file:me-2 file:h-8 file:cursor-pointer file:rounded-lg file:border-0 file:bg-secondary file:px-3 file:text-xs file:font-semibold"
+                />
+              </label>
+              {values.imageUrl && !imageFile && (
+                <label className="flex items-center gap-2 text-xs">
+                  <input
+                    type="checkbox"
+                    name="removeImage"
+                    checked={removeImage}
+                    onChange={(event) => setRemoveImage(event.target.checked)}
+                    className="size-4 accent-[var(--primary)]"
+                  />
+                  Remove image and show the icon
+                </label>
+              )}
+            </div>
+          </div>
+          <p className="text-xs text-muted-foreground">Without an image, the icon below is shown.</p>
           <div className="flex items-end gap-3">
             <label className="block flex-1 text-sm font-medium">
               Icon
@@ -99,9 +145,6 @@ export function ProductForm({ values, categories, currency }: ProductFormProps) 
                 className="mt-1.5 block h-10 w-14 cursor-pointer rounded-lg border border-border bg-background p-1"
               />
             </label>
-            <span className="grid size-10 shrink-0 place-items-center rounded-lg border border-border bg-secondary">
-              <DynamicIcon icon={icon} className="size-5" style={{ color }} />
-            </span>
           </div>
           <label className="flex items-center gap-2 text-sm">
             <input type="checkbox" name="active" defaultChecked={values.active} className="size-4 accent-[var(--primary)]" />

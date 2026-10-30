@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useActionState, useState } from "react";
 import { Loader2, Lock } from "lucide-react";
 import { placeOrder } from "@/app/actions/checkout";
-import { getIcon } from "@/lib/icons";
+import { ProductVisual } from "@/components/product-visual";
 import { formatPrice } from "@/lib/money";
 import { cn } from "@/lib/utils";
 import { useCart } from "./cart-provider";
@@ -87,11 +87,10 @@ export function CheckoutForm({ providers, email }: { providers: CheckoutProvider
         <h2 className="font-semibold">Order summary</h2>
         <ul className="mt-4 space-y-3">
           {items.map((item) => {
-            const Icon = getIcon(item.icon);
             return (
               <li key={item.productId} className="flex items-center gap-3 text-sm">
-                <span className="grid size-9 shrink-0 place-items-center rounded-lg border border-border bg-secondary">
-                  <Icon className="size-4" style={{ color: item.iconColor }} />
+                <span className="grid size-9 shrink-0 place-items-center overflow-hidden rounded-lg border border-border bg-secondary p-1">
+                  <ProductVisual imageUrl={item.imageUrl} icon={item.icon} iconColor={item.iconColor} iconClassName="size-4" />
                 </span>
                 <span className="min-w-0 flex-1 truncate">
                   {item.name} <span className="text-muted-foreground">× {item.quantity}</span>

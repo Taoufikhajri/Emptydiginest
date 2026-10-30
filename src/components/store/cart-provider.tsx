@@ -10,6 +10,7 @@ export type CartItem = {
   priceCents: number;
   icon: string;
   iconColor: string;
+  imageUrl?: string | null;
   quantity: number;
 };
 

@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { Check, Mail, ShieldCheck, Zap } from "lucide-react";
 import { ProductGrid } from "@/components/store/product-card";
 import { ProductPurchase } from "@/components/store/product-purchase";
-import { DynamicIcon } from "@/lib/icons";
+import { ProductVisual } from "@/components/product-visual";
 import { discountPercent, formatPrice } from "@/lib/money";
 import { getProductBySlug, getRelatedProducts } from "@/lib/queries";
 import { getSettings } from "@/lib/settings";
@@ -51,9 +51,13 @@ export default async function ProductPage({ params }: Props) {
 
       <div className="mt-6 grid gap-6 lg:grid-cols-[1.1fr_1fr] lg:gap-10">
         <div className="flex aspect-[4/3] items-center justify-center rounded-(--store-radius) bg-card shadow-[0_4px_6px_-1px_rgba(0,0,0,0.08)]">
-          <div className="grid size-32 place-items-center rounded-3xl border border-border bg-secondary sm:size-40">
-            <DynamicIcon icon={product.icon} className="size-16 sm:size-20" style={{ color: product.iconColor }} />
-          </div>
+          {product.imageUrl ? (
+            <ProductVisual imageUrl={product.imageUrl} icon={product.icon} iconColor={product.iconColor} className="max-h-[70%] max-w-[70%]" />
+          ) : (
+            <div className="grid size-32 place-items-center rounded-3xl border border-border bg-secondary sm:size-40">
+              <ProductVisual icon={product.icon} iconColor={product.iconColor} iconClassName="size-16 sm:size-20" />
+            </div>
+          )}
         </div>
 
         <div className="rounded-(--store-radius) bg-card p-6 shadow-[0_4px_6px_-1px_rgba(0,0,0,0.08)] sm:p-8">
@@ -91,6 +95,7 @@ export default async function ProductPage({ params }: Props) {
                 priceCents: product.priceCents,
                 icon: product.icon,
                 iconColor: product.iconColor,
+                imageUrl: product.imageUrl,
               }}
             />
           </div>

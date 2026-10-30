@@ -60,6 +60,7 @@ export default async function EditProductPage({ params }: { params: Promise<{ id
           categoryId: product.categoryId,
           icon: product.icon,
           iconColor: product.iconColor,
+          imageUrl: product.imageUrl,
           price: centsToInput(product.priceCents),
           compareAt: centsToInput(product.compareAtCents),
           features: product.features.join("\n"),

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { ArrowRight, Minus, Plus, ShoppingBag, Trash2 } from "lucide-react";
-import { getIcon } from "@/lib/icons";
+import { ProductVisual } from "@/components/product-visual";
 import { formatPrice } from "@/lib/money";
 import { useCart } from "./cart-provider";
 
@@ -33,11 +33,10 @@ export function CartView({ signedIn }: { signedIn: boolean }) {
     <div className="grid gap-6 lg:grid-cols-[1fr_360px]">
       <ul className="divide-y divide-border/70 rounded-(--store-radius) bg-card px-4 sm:px-6">
         {items.map((item) => {
-          const Icon = getIcon(item.icon);
           return (
             <li key={item.productId} className="flex flex-wrap items-center gap-4 py-5 sm:flex-nowrap">
-              <div className="grid size-12 shrink-0 place-items-center rounded-xl border border-border bg-secondary">
-                <Icon className="size-6" style={{ color: item.iconColor }} />
+              <div className="grid size-12 shrink-0 place-items-center overflow-hidden rounded-xl border border-border bg-secondary p-1.5">
+                <ProductVisual imageUrl={item.imageUrl} icon={item.icon} iconColor={item.iconColor} iconClassName="size-6" />
               </div>
               <div className="min-w-0 flex-1">
                 <Link href={`/products/${item.slug}`} className="line-clamp-2 text-sm font-semibold hover:text-primary">

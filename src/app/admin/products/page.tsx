@@ -3,7 +3,7 @@ import Link from "next/link";
 import { Eye, EyeOff, Pencil, Plus, Star } from "lucide-react";
 import { toggleProductActive } from "@/app/actions/admin";
 import { PageHeader, Panel, buttonClass } from "@/components/admin/ui";
-import { getIcon } from "@/lib/icons";
+import { ProductVisual } from "@/components/product-visual";
 import { formatPrice } from "@/lib/money";
 import { getProducts } from "@/lib/queries";
 import { getSettings } from "@/lib/settings";
@@ -57,13 +57,12 @@ export default async function AdminProductsPage({ searchParams }: { searchParams
             </thead>
             <tbody className="divide-y divide-border">
               {products.map((product) => {
-                const Icon = getIcon(product.icon);
                 return (
                   <tr key={product.id} className={cn("hover:bg-secondary/60", !product.active && "text-muted-foreground")}>
                     <td className="px-5 py-3">
                       <div className="flex items-center gap-3">
-                        <span className="grid size-9 shrink-0 place-items-center rounded-lg border border-border bg-secondary">
-                          <Icon className="size-4" style={{ color: product.iconColor }} />
+                        <span className="grid size-9 shrink-0 place-items-center overflow-hidden rounded-lg border border-border bg-secondary p-1">
+                          <ProductVisual imageUrl={product.imageUrl} icon={product.icon} iconColor={product.iconColor} iconClassName="size-4" />
                         </span>
                         <Link href={`/admin/products/${product.id}`} className="font-medium hover:text-primary">
                           {product.name}

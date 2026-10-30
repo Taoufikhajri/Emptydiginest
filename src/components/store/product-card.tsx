@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Check } from "lucide-react";
+import { ProductVisual } from "@/components/product-visual";
 import { DynamicIcon } from "@/lib/icons";
 import { discountPercent, formatPrice } from "@/lib/money";
 import type { Product } from "@/lib/queries";
@@ -22,8 +23,8 @@ export function ProductCard({ product, currency }: { product: Product; currency:
           </Link>
         )}
         <div className="my-3 flex items-start gap-3">
-          <div className="mt-0.5 flex size-10 shrink-0 items-center justify-center rounded-md border border-border bg-secondary p-2 transition-colors group-hover:border-primary/50">
-            <DynamicIcon icon={product.icon} className="size-5" style={{ color: product.iconColor }} />
+          <div className="mt-0.5 flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-md border border-border bg-secondary p-1.5 transition-colors group-hover:border-primary/50">
+            <ProductVisual imageUrl={product.imageUrl} icon={product.icon} iconColor={product.iconColor} iconClassName="size-5" />
           </div>
           <h3 className="line-clamp-2 min-w-0 flex-1 text-sm leading-snug font-semibold tracking-[-0.025em] text-foreground transition-colors group-hover:text-primary">
             <Link href={href}>{product.name}</Link>
@@ -76,6 +77,7 @@ export function ProductCard({ product, currency }: { product: Product; currency:
               priceCents: product.priceCents,
               icon: product.icon,
               iconColor: product.iconColor,
+              imageUrl: product.imageUrl,
             }}
           />
         </div>

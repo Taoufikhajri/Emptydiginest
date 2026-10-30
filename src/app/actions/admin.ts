@@ -6,6 +6,7 @@ import { z } from "zod";
 import { requireAdmin } from "@/lib/auth";
 import { query, queryOne } from "@/lib/db";
 import { iconNames } from "@/lib/icons";
+import { checkImageUpload, readImageUpload } from "@/lib/images";
 import { parsePriceToCents } from "@/lib/money";
 import { orderStatuses } from "@/lib/queries";
 
@@ -57,6 +58,9 @@ export async function saveProduct(_state: AdminFormState, formData: FormData): P
     .filter(Boolean)
     .slice(0, 10);
 
+  const imageError = checkImageUpload(formData.get("image"), "product image");
+  if (imageError) return { error: imageError };
+
   const id = Number(formData.get("id")) || null;
   const clash = await queryOne<{ id: number }>("SELECT id FROM products WHERE slug = $1 AND id IS DISTINCT FROM $2", [slug, id]);
   if (clash) return { error: "Another product already uses this slug." };
@@ -76,6 +80,7 @@ export async function saveProduct(_state: AdminFormState, formData: FormData): P
     formData.get("active") === "on",
   ];
 
+  let productId = id;
   if (id) {
     await query(
       `UPDATE products SET slug = $1, name = $2, category_id = $3, description = $4, icon = $5, icon_color = $6,
@@ -85,12 +90,24 @@ export async function saveProduct(_state: AdminFormState, formData: FormData): P
       [...values, id],
     );
   } else {
-    await query(
+    const created = await queryOne<{ id: number }>(
       `INSERT INTO products (slug, name, category_id, description, icon, icon_color, price_cents, compare_at_cents,
          features, buyers_this_month, featured, active)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9::jsonb, $10, $11, $12)`,
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9::jsonb, $10, $11, $12) RETURNING id`,
       values,
     );
+    productId = created?.id ?? null;
+  }
+
+  const image = await readImageUpload(formData.get("image"));
+  if (image && productId) {
+    await query(
+      `INSERT INTO product_images (product_id, content_type, data) VALUES ($1, $2, $3)
+       ON CONFLICT (product_id) DO UPDATE SET content_type = EXCLUDED.content_type, data = EXCLUDED.data, updated_at = now()`,
+      [productId, image.contentType, image.base64],
+    );
+  } else if (formData.get("removeImage") === "on" && productId) {
+    await query("DELETE FROM product_images WHERE product_id = $1", [productId]);
   }
   revalidateStore();
   redirect("/admin/products?saved=1");

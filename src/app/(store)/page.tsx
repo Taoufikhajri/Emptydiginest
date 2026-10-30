@@ -43,6 +43,7 @@ export default async function HomePage() {
                 priceCents: product.priceCents,
                 icon: product.icon,
                 iconColor: product.iconColor,
+                imageUrl: product.imageUrl,
               }
             : undefined,
       },

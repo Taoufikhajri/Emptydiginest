@@ -14,6 +14,7 @@ import {
   readableTextOn,
   type StoreSettings,
 } from "@/lib/settings-shared";
+import { imageAccept } from "@/lib/images";
 import { cn } from "@/lib/utils";
 import { HeroCardsEditor, type HeroCardProduct } from "./hero-cards-editor";
 import { buttonClass, inputClass, secondaryButtonClass } from "./ui";
@@ -115,7 +116,7 @@ export function SettingsForm({ values, logoUrl, envBinanceRate, products }: Sett
                   ref={logoInputRef}
                   name="logo"
                   type="file"
-                  accept="image/png,image/jpeg,image/webp,image/gif,image/svg+xml"
+                  accept={imageAccept}
                   onChange={(event) => setLogoFile(event.target.files?.[0] ?? null)}
                   className="mt-1.5 block w-full text-sm file:me-3 file:h-9 file:cursor-pointer file:rounded-lg file:border-0 file:bg-secondary file:px-3 file:text-sm file:font-semibold"
                 />

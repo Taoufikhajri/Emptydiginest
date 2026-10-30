@@ -25,6 +25,7 @@ export default async function NewProductPage() {
           categoryId: categories[0]?.id ?? null,
           icon: "Package",
           iconColor: "#5433eb",
+          imageUrl: null,
           price: "",
           compareAt: "",
           features: "",

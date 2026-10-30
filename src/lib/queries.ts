@@ -21,6 +21,8 @@ export type Product = {
   description: string;
   icon: string;
   iconColor: string;
+  // Uploaded in the admin; when null, the icon is shown instead.
+  imageUrl: string | null;
   priceCents: number;
   compareAtCents: number | null;
   features: string[];
@@ -68,6 +70,7 @@ type ProductRow = {
   description: string;
   icon: string;
   icon_color: string;
+  image_updated_at: Date | null;
   price_cents: number;
   compare_at_cents: number | null;
   features: string[];
@@ -104,6 +107,7 @@ const toProduct = (row: ProductRow): Product => ({
   description: row.description,
   icon: row.icon,
   iconColor: row.icon_color,
+  imageUrl: row.image_updated_at ? `/media/products/${row.id}?v=${new Date(row.image_updated_at).getTime()}` : null,
   priceCents: row.price_cents,
   compareAtCents: row.compare_at_cents,
   features: Array.isArray(row.features) ? row.features : [],
@@ -130,8 +134,8 @@ export const toOrder = (row: OrderRow): Order => ({
 });
 
 const productSelect = `
-  SELECT p.*, c.slug AS category_slug, c.name AS category_name, c.icon AS category_icon
-  FROM products p LEFT JOIN categories c ON c.id = p.category_id`;
+  SELECT p.*, c.slug AS category_slug, c.name AS category_name, c.icon AS category_icon, pi.updated_at AS image_updated_at
+  FROM products p LEFT JOIN categories c ON c.id = p.category_id LEFT JOIN product_images pi ON pi.product_id = p.id`;
 
 export async function getCategories() {
   const rows = await query<{ id: number; slug: string; name: string; icon: string; sort_order: number; product_count: number }>(

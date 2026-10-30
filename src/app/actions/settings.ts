@@ -16,10 +16,9 @@ import {
   saveSettings,
   type StoreSettings,
 } from "@/lib/settings";
+import { checkImageUpload, readImageUpload } from "@/lib/images";
 import type { AdminFormState } from "./admin";
 
-const MAX_LOGO_BYTES = 500 * 1024;
-const logoTypes = ["image/png", "image/jpeg", "image/webp", "image/gif", "image/svg+xml"];
 
 const hexColor = (label: string) => z.string().refine(isHexColor, `Pick a valid ${label}.`);
 
@@ -68,11 +67,8 @@ export async function updateSettings(_state: AdminFormState, formData: FormData)
   const parsed = settingsSchema.safeParse(Object.fromEntries(formData));
   if (!parsed.success) return { error: parsed.error.issues[0].message };
 
-  const logo = formData.get("logo");
-  if (logo instanceof File && logo.size > 0) {
-    if (!logoTypes.includes(logo.type)) return { error: "Upload the logo as PNG, JPG, WebP, GIF or SVG." };
-    if (logo.size > MAX_LOGO_BYTES) return { error: "The logo must be 500 KB or smaller." };
-  }
+  const logoError = checkImageUpload(formData.get("logo"), "logo");
+  if (logoError) return { error: logoError };
 
   let rawHeroCards: unknown;
   try {
@@ -96,8 +92,9 @@ export async function updateSettings(_state: AdminFormState, formData: FormData)
   };
   await saveSettings(settings);
 
-  if (logo instanceof File && logo.size > 0) {
-    await saveLogo({ contentType: logo.type, base64: Buffer.from(await logo.arrayBuffer()).toString("base64") });
+  const logo = await readImageUpload(formData.get("logo"));
+  if (logo) {
+    await saveLogo(logo);
   } else if (formData.get("removeLogo") === "on") {
     await saveLogo(null);
   }

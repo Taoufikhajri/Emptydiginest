@@ -2,13 +2,14 @@ import type { Metadata } from "next";
 import { CheckoutForm, type CheckoutProvider } from "@/components/store/checkout-form";
 import { requireUser } from "@/lib/auth";
 import { isDemoProvider, isProviderAvailable, providers } from "@/lib/payments";
+import { getStoredSettings } from "@/lib/settings";
 
 export const metadata: Metadata = { title: "Checkout" };
 
 export default async function CheckoutPage() {
-  const user = await requireUser("/checkout");
+  const [user, settings] = await Promise.all([requireUser("/checkout"), getStoredSettings()]);
   const available: CheckoutProvider[] = Object.values(providers)
-    .filter((provider) => isProviderAvailable(provider.id))
+    .filter((provider) => isProviderAvailable(provider.id, settings))
     .map((provider) => ({
       id: provider.id,
       label: provider.label,

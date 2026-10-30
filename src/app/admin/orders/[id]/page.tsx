@@ -26,7 +26,7 @@ export default async function AdminOrderPage({ params }: { params: Promise<{ id:
     ["Paid", order.paidAt ? order.paidAt.toLocaleString("en-GB", { dateStyle: "medium", timeStyle: "short" }) : "Not yet"],
     ["Payment provider", order.paymentProvider],
     ["Provider reference", order.paymentRef ?? "None (demo mode or not started)"],
-    ["Amount charged", order.paymentAmount ?? formatPrice(order.totalCents)],
+    ["Amount charged", order.paymentAmount ?? formatPrice(order.totalCents, order.currency)],
   ];
 
   return (
@@ -62,16 +62,16 @@ export default async function AdminOrderPage({ params }: { params: Promise<{ id:
                     )}
                     <span className="text-muted-foreground">
                       {" "}
-                      × {item.quantity} at {formatPrice(item.unitPriceCents)}
+                      × {item.quantity} at {formatPrice(item.unitPriceCents, order.currency)}
                     </span>
                   </span>
-                  <span className="font-semibold tabular-nums">{formatPrice(item.unitPriceCents * item.quantity)}</span>
+                  <span className="font-semibold tabular-nums">{formatPrice(item.unitPriceCents * item.quantity, order.currency)}</span>
                 </li>
               ))}
             </ul>
             <div className="flex justify-between border-t border-border px-5 py-4 font-semibold">
               <span>Total</span>
-              <span className="tabular-nums">{formatPrice(order.totalCents)}</span>
+              <span className="tabular-nums">{formatPrice(order.totalCents, order.currency)}</span>
             </div>
           </Panel>
           <Panel className="p-5">

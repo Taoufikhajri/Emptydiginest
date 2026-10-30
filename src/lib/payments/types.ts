@@ -1,4 +1,5 @@
 import type { Order } from "../queries";
+import type { StoreSettings } from "../settings-shared";
 
 export type ProviderId = "nowpayments" | "binance";
 
@@ -6,6 +7,7 @@ export type CreatePaymentInput = {
   order: Order;
   items: { name: string; unitPriceCents: number; quantity: number }[];
   baseUrl: string;
+  settings: StoreSettings;
 };
 
 export type PaymentProvider = {

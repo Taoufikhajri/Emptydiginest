@@ -7,6 +7,7 @@ import { ConfirmButton } from "@/components/admin/confirm-button";
 import { ProductForm } from "@/components/admin/product-form";
 import { PageHeader } from "@/components/admin/ui";
 import { getCategories, getProductById } from "@/lib/queries";
+import { getSettings } from "@/lib/settings";
 
 export const metadata: Metadata = { title: "Edit product" };
 
@@ -14,7 +15,11 @@ const centsToInput = (cents: number | null) => (cents === null ? "" : (cents / 1
 
 export default async function EditProductPage({ params }: { params: Promise<{ id: string }> }) {
   const id = Number((await params).id);
-  const [product, categories] = await Promise.all([Number.isInteger(id) ? getProductById(id) : null, getCategories()]);
+  const [product, categories, { currency }] = await Promise.all([
+    Number.isInteger(id) ? getProductById(id) : null,
+    getCategories(),
+    getSettings(),
+  ]);
   if (!product) notFound();
 
   return (
@@ -45,6 +50,7 @@ export default async function EditProductPage({ params }: { params: Promise<{ id
         }
       />
       <ProductForm
+        currency={currency}
         categories={categories}
         values={{
           id: product.id,

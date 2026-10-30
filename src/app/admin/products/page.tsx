@@ -6,6 +6,7 @@ import { PageHeader, Panel, buttonClass } from "@/components/admin/ui";
 import { getIcon } from "@/lib/icons";
 import { formatPrice } from "@/lib/money";
 import { getProducts } from "@/lib/queries";
+import { getSettings } from "@/lib/settings";
 import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = { title: "Products" };
@@ -13,7 +14,7 @@ export const metadata: Metadata = { title: "Products" };
 export default async function AdminProductsPage({ searchParams }: { searchParams: Promise<{ saved?: string; q?: string }> }) {
   const { saved, q } = await searchParams;
   const search = q?.trim().slice(0, 100);
-  const products = await getProducts({ includeInactive: true, search });
+  const [products, { currency }] = await Promise.all([getProducts({ includeInactive: true, search }), getSettings()]);
 
   return (
     <>
@@ -71,7 +72,7 @@ export default async function AdminProductsPage({ searchParams }: { searchParams
                       </div>
                     </td>
                     <td className="px-5 py-3">{product.categoryName ?? "—"}</td>
-                    <td className="px-5 py-3 text-end tabular-nums">{formatPrice(product.priceCents)}</td>
+                    <td className="px-5 py-3 text-end tabular-nums">{formatPrice(product.priceCents, currency)}</td>
                     <td className="px-5 py-3">
                       <span
                         className={cn(

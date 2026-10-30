@@ -15,6 +15,7 @@ import {
   providers,
 } from "@/lib/payments";
 import { getOrderByPublicId, toOrder } from "@/lib/queries";
+import { getStoredSettings } from "@/lib/settings";
 import { getBaseUrl } from "@/lib/url";
 
 export type CheckoutState = { error?: string } | undefined;
@@ -31,8 +32,9 @@ export async function placeOrder(_state: CheckoutState, formData: FormData): Pro
   const user = await getCurrentUser();
   if (!user) redirect("/login?next=/checkout");
 
+  const settings = await getStoredSettings();
   const provider = formData.get("provider");
-  if (!isProviderId(provider) || !isProviderAvailable(provider)) {
+  if (!isProviderId(provider) || !isProviderAvailable(provider, settings)) {
     return { error: "Choose an available payment method." };
   }
 
@@ -64,9 +66,9 @@ export async function placeOrder(_state: CheckoutState, formData: FormData): Pro
 
   const publicId = randomBytes(6).toString("hex").toUpperCase();
   const [row] = await query<Parameters<typeof toOrder>[0]>(
-    `INSERT INTO orders (public_id, user_id, email, payment_provider, total_cents)
-     VALUES ($1, $2, $3, $4, $5) RETURNING *`,
-    [publicId, user.id, user.email, provider, totalCents],
+    `INSERT INTO orders (public_id, user_id, email, payment_provider, total_cents, currency)
+     VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
+    [publicId, user.id, user.email, provider, totalCents, settings.currency],
   );
   const order = toOrder(row);
   for (const item of items) {
@@ -84,7 +86,7 @@ export async function placeOrder(_state: CheckoutState, formData: FormData): Pro
 
   let redirectUrl: string;
   try {
-    const payment = await providers[provider].createPayment({ order, items, baseUrl: await getBaseUrl() });
+    const payment = await providers[provider].createPayment({ order, items, baseUrl: await getBaseUrl(), settings });
     await query("UPDATE orders SET payment_ref = $1, payment_url = $2, payment_amount = $3 WHERE id = $4", [
       payment.reference,
       payment.redirectUrl,

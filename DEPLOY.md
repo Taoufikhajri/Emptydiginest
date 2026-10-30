@@ -23,6 +23,7 @@ Payment providers without API keys run in **demo mode** locally: the order page 
 | `/orders/[id]` order status and delivery | Products: create, edit, hide, delete |
 | `/account`, `/login`, `/register` | Categories: create, rename, reorder, delete |
 | `/guarantee`, `/terms`, `/privacy` | Customers: order totals, grant or remove admin |
+| | Settings: store name, logo, currency, Binance rate, home page sections, colors, font, corners |
 
 ## How an order flows
 
@@ -59,7 +60,7 @@ The embedded local database does **not** work on Vercel or Railway. Always set `
 | `NOWPAYMENTS_API_KEY`, `NOWPAYMENTS_IPN_SECRET` | To accept NOWPayments | From the NOWPayments dashboard. Set the IPN callback URL there to `APP_URL/api/webhooks/nowpayments` |
 | `NOWPAYMENTS_SANDBOX` | Optional | `true` to test with sandbox keys |
 | `BINANCE_PAY_API_KEY`, `BINANCE_PAY_SECRET_KEY` | To accept Binance Pay | From the Binance Pay merchant portal |
-| `BINANCE_PAY_USDT_PER_EUR` | With Binance Pay | EUR → USDT rate used to price orders; keep it current |
+| `BINANCE_PAY_USDT_PER_EUR` | Optional | Fallback USDT rate. Prefer setting the rate in **Admin → Settings** (USDT per 1 unit of the store currency) and keeping it current |
 | `SEED_PLACEHOLDER_PRODUCTS` | Optional | `false` to start with an empty catalog |
 | `ALLOW_DEMO_PAYMENTS` | Never on a live store | Lets unpaid demo orders be marked paid |
 
@@ -67,8 +68,9 @@ A payment method only appears at checkout once its keys are set, unless demo pay
 
 ## Before going live
 
-- Replace the placeholder products, logo (`src/components/store/brand-mark.tsx`) and the terms, privacy and
-  guarantee text.
+- In **Admin → Settings**, set your store name, support email, logo, currency and colors.
+- Replace the placeholder products and the terms, privacy and guarantee text.
+- Changing the currency doesn't convert product prices: update them in **Admin → Products** afterwards.
 - Test each provider with sandbox or small real payments. The Binance Pay request format follows its v3 API docs
   and should be checked against your merchant account before launch.
 - Customers aren't emailed automatically yet. Delivery details appear on the order page.

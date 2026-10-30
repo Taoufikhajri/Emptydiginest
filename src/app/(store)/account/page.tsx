@@ -45,14 +45,14 @@ export default async function AccountPage() {
       <section className="mt-8">
         <h2 className="text-lg font-semibold tracking-[-0.03em]">My orders</h2>
         {orders.length === 0 ? (
-          <div className="mt-4 rounded-[28px] bg-card px-6 py-12 text-center">
+          <div className="mt-4 rounded-(--store-radius) bg-card px-6 py-12 text-center">
             <p className="text-muted-foreground">You haven&apos;t placed any orders yet.</p>
             <Link href="/products" className="mt-3 inline-block text-sm font-semibold text-primary hover:underline">
               Browse the catalog
             </Link>
           </div>
         ) : (
-          <ul className="mt-4 divide-y divide-border/70 rounded-[28px] bg-card px-4 sm:px-6">
+          <ul className="mt-4 divide-y divide-border/70 rounded-(--store-radius) bg-card px-4 sm:px-6">
             {orders.map((order) => (
               <li key={order.id}>
                 <Link href={`/orders/${order.publicId}`} className="flex flex-wrap items-center gap-x-4 gap-y-1 py-4 hover:text-primary">
@@ -62,7 +62,7 @@ export default async function AccountPage() {
                   </span>
                   <span className="ms-auto flex items-center gap-3">
                     <OrderStatusBadge status={order.status} short />
-                    <span className="w-20 text-end text-sm font-semibold tabular-nums">{formatPrice(order.totalCents)}</span>
+                    <span className="w-20 text-end text-sm font-semibold tabular-nums">{formatPrice(order.totalCents, order.currency)}</span>
                   </span>
                 </Link>
               </li>

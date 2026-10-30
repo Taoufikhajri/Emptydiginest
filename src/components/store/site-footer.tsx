@@ -1,10 +1,17 @@
 import Link from "next/link";
-import { siteConfig } from "@/lib/site-config";
 import { BrandMark } from "./brand-mark";
+import type { StoreBrand } from "./site-header";
 
 type FooterLink = { label: string; href: string };
 
-export function SiteFooter({ categories }: { categories: { slug: string; name: string }[] }) {
+type SiteFooterProps = {
+  brand: StoreBrand;
+  description: string;
+  supportEmail: string;
+  categories: { slug: string; name: string }[];
+};
+
+export function SiteFooter({ brand, description, supportEmail, categories }: SiteFooterProps) {
   const browse: FooterLink[] = [
     { label: "All products", href: "/products" },
     ...categories.map((category) => ({ label: category.name, href: `/categories/${category.slug}` })),
@@ -17,7 +24,7 @@ export function SiteFooter({ categories }: { categories: { slug: string; name: s
   const help: FooterLink[] = [
     { label: "My orders", href: "/account" },
     { label: "Cart", href: "/cart" },
-    { label: "Contact", href: `mailto:${siteConfig.supportEmail}` },
+    ...(supportEmail ? [{ label: "Contact", href: `mailto:${supportEmail}` }] : []),
   ];
 
   return (
@@ -26,17 +33,17 @@ export function SiteFooter({ categories }: { categories: { slug: string; name: s
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-[2fr_1fr_1fr_1fr]">
           <div>
             <Link href="/" className="inline-flex items-center gap-2 font-semibold tracking-tight">
-              <BrandMark className="size-7" />
-              {siteConfig.name}
+              <BrandMark logoUrl={brand.logoUrl} className="h-7" />
+              <span className={brand.showName ? undefined : "sr-only"}>{brand.name}</span>
             </Link>
-            <p className="mt-3 max-w-xs text-sm text-muted-foreground">{siteConfig.description}</p>
+            <p className="mt-3 max-w-xs text-sm text-muted-foreground">{description}</p>
           </div>
           <FooterColumn title="Browse" links={browse} />
           <FooterColumn title="Legal" links={legal} />
           <FooterColumn title="Help" links={help} />
         </div>
         <p className="mt-12 text-xs text-muted-foreground">
-          © {new Date().getFullYear()} {siteConfig.name}. All rights reserved.
+          © {new Date().getFullYear()} {brand.name}. All rights reserved.
         </p>
       </div>
     </footer>

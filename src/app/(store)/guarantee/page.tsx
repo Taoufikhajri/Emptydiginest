@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import { ContentPage } from "@/components/store/content-page";
-import { siteConfig } from "@/lib/site-config";
+import { getSettings } from "@/lib/settings";
 
 export const metadata: Metadata = { title: "Guarantee & refunds" };
 
-export default function GuaranteePage() {
+export default async function GuaranteePage() {
+  const { supportEmail } = await getSettings();
   return (
     <ContentPage
       title="Guarantee & refunds"
@@ -20,7 +21,7 @@ export default function GuaranteePage() {
         },
         {
           heading: "How to make a claim",
-          body: `Email ${siteConfig.supportEmail} with your order number and a short description of the problem. Most claims are answered within one business day.`,
+          body: `Email ${supportEmail} with your order number and a short description of the problem. Most claims are answered within one business day.`,
         },
       ]}
     />

@@ -6,6 +6,7 @@ import { PageHeader, Panel } from "@/components/admin/ui";
 import { requireAdmin } from "@/lib/auth";
 import { query } from "@/lib/db";
 import { formatPrice } from "@/lib/money";
+import { getSettings } from "@/lib/settings";
 import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = { title: "Customers" };
@@ -14,6 +15,7 @@ export default async function AdminCustomersPage({ searchParams }: { searchParam
   const admin = await requireAdmin();
   const { q } = await searchParams;
   const search = q?.trim().slice(0, 100);
+  const { currency } = await getSettings();
   const users = await query<{
     id: number;
     name: string;
@@ -25,11 +27,11 @@ export default async function AdminCustomersPage({ searchParams }: { searchParam
   }>(
     `SELECT u.id, u.name, u.email, u.role, u.created_at,
        count(o.id)::int AS order_count,
-       COALESCE(sum(o.total_cents) FILTER (WHERE o.status IN ('paid', 'delivered')), 0)::int AS spent_cents
+       COALESCE(sum(o.total_cents) FILTER (WHERE o.status IN ('paid', 'delivered') AND o.currency = $1), 0)::int AS spent_cents
      FROM users u LEFT JOIN orders o ON o.user_id = u.id
-     ${search ? "WHERE u.email ILIKE $1 OR u.name ILIKE $1" : ""}
+     ${search ? "WHERE u.email ILIKE $2 OR u.name ILIKE $2" : ""}
      GROUP BY u.id ORDER BY u.created_at DESC LIMIT 500`,
-    search ? [`%${search}%`] : [],
+    search ? [currency, `%${search}%`] : [currency],
   );
 
   return (
@@ -77,7 +79,7 @@ export default async function AdminCustomersPage({ searchParams }: { searchParam
                       0
                     )}
                   </td>
-                  <td className="px-5 py-3 text-end tabular-nums">{formatPrice(user.spent_cents)}</td>
+                  <td className="px-5 py-3 text-end tabular-nums">{formatPrice(user.spent_cents, currency)}</td>
                   <td className="px-5 py-3">
                     <span
                       className={cn(

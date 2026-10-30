@@ -5,7 +5,7 @@ import { discountPercent, formatPrice } from "@/lib/money";
 import type { Product } from "@/lib/queries";
 import { AddToCartButton } from "./add-to-cart-button";
 
-export function ProductCard({ product }: { product: Product }) {
+export function ProductCard({ product, currency }: { product: Product; currency: string }) {
   const discount = discountPercent(product.priceCents, product.compareAtCents);
   const href = `/products/${product.slug}`;
 
@@ -47,11 +47,11 @@ export function ProductCard({ product }: { product: Product }) {
             <p className="mb-1 text-[11px] text-muted-foreground">{product.buyersThisMonth} buyers this month</p>
           )}
           <span className="text-xl font-semibold tracking-tight tabular-nums text-foreground">
-            {formatPrice(product.priceCents)}
+            {formatPrice(product.priceCents, currency)}
           </span>
           {discount > 0 && product.compareAtCents && (
             <div className="flex items-center gap-1.5 pt-0.5 text-[11px]">
-              <span className="text-muted-foreground tabular-nums line-through">{formatPrice(product.compareAtCents)}</span>
+              <span className="text-muted-foreground tabular-nums line-through">{formatPrice(product.compareAtCents, currency)}</span>
               <span className="rounded bg-signal-emerald/10 px-1.5 py-0.5 text-[10px] font-semibold text-signal-emerald">
                 {discount}% off
               </span>
@@ -84,11 +84,11 @@ export function ProductCard({ product }: { product: Product }) {
   );
 }
 
-export function ProductGrid({ products }: { products: Product[] }) {
+export function ProductGrid({ products, currency }: { products: Product[]; currency: string }) {
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
       {products.map((product) => (
-        <ProductCard key={product.id} product={product} />
+        <ProductCard key={product.id} product={product} currency={currency} />
       ))}
     </div>
   );

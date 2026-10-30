@@ -5,23 +5,26 @@ import { PageHeader, Panel } from "@/components/admin/ui";
 import { query, queryOne } from "@/lib/db";
 import { formatPrice } from "@/lib/money";
 import { toOrder } from "@/lib/queries";
+import { getSettings } from "@/lib/settings";
 
 export default async function AdminOverviewPage() {
+  const { currency } = await getSettings();
   const [stats, recentRows] = await Promise.all([
     queryOne<{ revenue: number; orders: number; awaiting_delivery: number; customers: number; products: number }>(
       `SELECT
-         (SELECT COALESCE(sum(total_cents), 0)::int FROM orders WHERE status IN ('paid', 'delivered')) AS revenue,
+         (SELECT COALESCE(sum(total_cents), 0)::int FROM orders WHERE status IN ('paid', 'delivered') AND currency = $1) AS revenue,
          (SELECT count(*)::int FROM orders) AS orders,
          (SELECT count(*)::int FROM orders WHERE status = 'paid') AS awaiting_delivery,
          (SELECT count(*)::int FROM users WHERE role = 'customer') AS customers,
          (SELECT count(*)::int FROM products WHERE active) AS products`,
+      [currency],
     ),
     query<Parameters<typeof toOrder>[0]>("SELECT * FROM orders ORDER BY created_at DESC LIMIT 8"),
   ]);
   const recent = recentRows.map(toOrder);
 
   const cards = [
-    { label: "Revenue", value: formatPrice(stats?.revenue ?? 0), icon: TrendingUp, href: "/admin/orders?status=delivered" },
+    { label: "Revenue", value: formatPrice(stats?.revenue ?? 0, currency), icon: TrendingUp, href: "/admin/orders?status=delivered" },
     { label: "Awaiting delivery", value: stats?.awaiting_delivery ?? 0, icon: Clock, href: "/admin/orders?status=paid" },
     { label: "Orders", value: stats?.orders ?? 0, icon: Receipt, href: "/admin/orders" },
     { label: "Customers", value: stats?.customers ?? 0, icon: Users, href: "/admin/customers" },

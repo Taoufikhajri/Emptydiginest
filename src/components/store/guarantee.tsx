@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { ArrowRight, Bitcoin, Coins, DollarSign, Wallet } from "lucide-react";
-import { siteConfig } from "@/lib/site-config";
 
+const paymentMethods = ["Bitcoin", "Ethereum", "USDT", "Binance Pay"];
 const paymentIcons = [Bitcoin, Coins, DollarSign, Wallet];
 
 export function Guarantee() {
@@ -39,7 +39,7 @@ export function Guarantee() {
         <div className="mt-10 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
           <span className="text-sm font-medium text-muted-foreground sm:me-3">Pay with</span>
           <div className="flex flex-wrap gap-3">
-            {siteConfig.paymentMethods.map((method, index) => {
+            {paymentMethods.map((method, index) => {
               const Icon = paymentIcons[index % paymentIcons.length];
               return (
                 <span

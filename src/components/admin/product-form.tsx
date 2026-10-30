@@ -22,7 +22,9 @@ export type ProductFormValues = {
   active: boolean;
 };
 
-export function ProductForm({ values, categories }: { values: ProductFormValues; categories: { id: number; name: string }[] }) {
+type ProductFormProps = { values: ProductFormValues; categories: { id: number; name: string }[]; currency: string };
+
+export function ProductForm({ values, categories, currency }: ProductFormProps) {
   const [state, action, pending] = useActionState(saveProduct, undefined);
   const [icon, setIcon] = useState(values.icon);
   const [color, setColor] = useState(values.iconColor);
@@ -49,7 +51,7 @@ export function ProductForm({ values, categories }: { values: ProductFormValues;
         </label>
         <div className="grid gap-4 sm:grid-cols-3">
           <label className="block text-sm font-medium">
-            Price (EUR)
+            Price ({currency})
             <input name="price" required inputMode="decimal" defaultValue={values.price} placeholder="19.99" className={inputClass} />
           </label>
           <label className="block text-sm font-medium">

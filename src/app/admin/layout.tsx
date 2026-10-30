@@ -2,21 +2,29 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ExternalLink } from "lucide-react";
 import { AdminNav } from "@/components/admin/admin-nav";
+import { StoreTheme } from "@/components/store-theme";
 import { BrandMark } from "@/components/store/brand-mark";
 import { requireAdmin } from "@/lib/auth";
-import { siteConfig } from "@/lib/site-config";
+import { getSettings } from "@/lib/settings";
 
-export const metadata: Metadata = { title: { default: "Admin", template: `%s | ${siteConfig.name} Admin` } };
+export async function generateMetadata(): Promise<Metadata> {
+  const settings = await getSettings();
+  return {
+    title: { default: "Admin", template: `%s | ${settings.storeName} Admin` },
+    icons: { icon: settings.logoUrl ?? "/favicon.ico" },
+  };
+}
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
-  const admin = await requireAdmin();
+  const [admin, settings] = await Promise.all([requireAdmin(), getSettings()]);
 
   return (
     <div className="flex min-h-screen flex-col lg:flex-row">
+      <StoreTheme settings={settings} />
       <aside className="border-b border-border bg-card lg:sticky lg:top-0 lg:h-screen lg:w-60 lg:shrink-0 lg:border-e lg:border-b-0">
         <div className="flex h-16 items-center gap-2.5 px-5">
-          <BrandMark className="size-7" />
-          <span className="font-semibold tracking-tight">{siteConfig.name}</span>
+          <BrandMark logoUrl={settings.logoUrl} className="h-7" />
+          <span className="truncate font-semibold tracking-tight">{settings.storeName}</span>
           <span className="rounded bg-primary/10 px-1.5 py-0.5 text-[10px] font-semibold text-primary">Admin</span>
         </div>
         <AdminNav />

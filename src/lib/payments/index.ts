@@ -1,5 +1,6 @@
 import { query } from "../db";
-import { binancePay } from "./binance";
+import type { StoreSettings } from "../settings-shared";
+import { binancePay, binanceUsdtRate } from "./binance";
 import { nowPayments } from "./nowpayments";
 import type { PaymentProvider, ProviderId } from "./types";
 
@@ -20,7 +21,12 @@ export const isDemoProvider = (id: string) => !isProviderId(id) || !providers[id
 export const demoPaymentsAllowed = () =>
   process.env.NODE_ENV !== "production" || process.env.ALLOW_DEMO_PAYMENTS === "true";
 
-export const isProviderAvailable = (id: ProviderId) => providers[id].isConfigured() || demoPaymentsAllowed();
+// Ready to take real payments: keys are set and, for Binance Pay, a USDT rate is known.
+const isProviderReady = (id: ProviderId, settings: StoreSettings) =>
+  providers[id].isConfigured() && (id !== "binance" || binanceUsdtRate(settings) > 0);
+
+export const isProviderAvailable = (id: ProviderId, settings: StoreSettings) =>
+  isProviderReady(id, settings) || demoPaymentsAllowed();
 
 export async function markOrderPaid(publicId: string) {
   await query(

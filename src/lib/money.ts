@@ -1,7 +1,6 @@
-export const CURRENCY = "EUR";
-
-export const formatPrice = (cents: number) =>
-  new Intl.NumberFormat("en-IE", { style: "currency", currency: CURRENCY }).format(cents / 100);
+// The store currency is an admin setting; past orders keep the currency they were placed in.
+export const formatPrice = (cents: number, currency: string) =>
+  new Intl.NumberFormat("en-IE", { style: "currency", currency }).format(cents / 100);
 
 export const discountPercent = (priceCents: number, compareAtCents: number | null) =>
   compareAtCents && compareAtCents > priceCents

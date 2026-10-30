@@ -1,3 +1,4 @@
+import { connection } from "next/server";
 import { hashPassword } from "./password";
 import { seedCategories, seedProducts } from "./seed-data";
 
@@ -59,6 +60,8 @@ export function getDb() {
 }
 
 export async function query<T>(sql: string, params?: unknown[]) {
+  // Store data is per request: never query while `next build` prerenders, when the database may be unreachable.
+  await connection();
   const db = await getDb();
   return (await db.query<T>(sql, params)).rows;
 }
@@ -127,6 +130,15 @@ const schema = [
     name TEXT NOT NULL,
     unit_price_cents INTEGER NOT NULL,
     quantity INTEGER NOT NULL
+  )`,
+  // A single row (id = 1): settings JSON plus the uploaded logo, stored as base64.
+  `CREATE TABLE IF NOT EXISTS store_settings (
+    id INTEGER PRIMARY KEY CHECK (id = 1),
+    data JSONB NOT NULL DEFAULT '{}'::jsonb,
+    logo_type TEXT,
+    logo_data TEXT,
+    logo_updated_at TIMESTAMPTZ,
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
   )`,
   `CREATE INDEX IF NOT EXISTS orders_user_idx ON orders(user_id)`,
   `CREATE INDEX IF NOT EXISTS products_category_idx ON products(category_id)`,

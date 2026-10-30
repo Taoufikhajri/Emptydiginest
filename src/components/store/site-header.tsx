@@ -5,17 +5,19 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { ChevronDown, LayoutDashboard, Menu, Search, ShoppingBag, User, X } from "lucide-react";
 import { logout } from "@/app/actions/auth";
-import { siteConfig } from "@/lib/site-config";
 import { cn } from "@/lib/utils";
 import { BrandMark } from "./brand-mark";
 import { useCart } from "./cart-provider";
 
+export type StoreBrand = { name: string; logoUrl: string | null; showName: boolean };
+
 type SiteHeaderProps = {
+  brand: StoreBrand;
   categories: { slug: string; name: string }[];
   user: { name: string; role: string } | null;
 };
 
-export function SiteHeader({ categories, user }: SiteHeaderProps) {
+export function SiteHeader({ brand, categories, user }: SiteHeaderProps) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -108,8 +110,8 @@ export function SiteHeader({ categories, user }: SiteHeaderProps) {
     <header className="sticky top-0 z-40 w-full bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
       <div className="mx-auto flex h-16 max-w-7xl items-center gap-2 px-4 sm:px-6 lg:gap-3 lg:px-8">
         <Link href="/" className="flex shrink-0 items-center gap-2.5 font-semibold tracking-tight">
-          <BrandMark className="size-8" />
-          <span className="text-[17px]">{siteConfig.name}</span>
+          <BrandMark logoUrl={brand.logoUrl} className="h-8" />
+          <span className={brand.showName ? "text-[17px]" : "sr-only"}>{brand.name}</span>
         </Link>
 
         <nav className="ms-4 hidden items-center gap-1 text-sm text-foreground/80 lg:flex">

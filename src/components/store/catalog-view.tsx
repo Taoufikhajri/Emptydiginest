@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Search } from "lucide-react";
 import type { Category, Product } from "@/lib/queries";
+import { getSettings } from "@/lib/settings";
 import { CategoryChips } from "./category-chips";
 import { ProductGrid } from "./product-card";
 
@@ -16,7 +17,8 @@ type CatalogViewProps = {
   action: string;
 };
 
-export function CatalogView({ title, description, categories, products, totalCount, activeSlug, search, action }: CatalogViewProps) {
+export async function CatalogView({ title, description, categories, products, totalCount, activeSlug, search, action }: CatalogViewProps) {
+  const { currency } = await getSettings();
   return (
     <section className="mx-auto max-w-7xl px-4 pt-10 pb-20 sm:px-6 lg:px-8">
       <nav aria-label="Breadcrumb" className="text-xs text-muted-foreground">
@@ -59,9 +61,9 @@ export function CatalogView({ title, description, categories, products, totalCou
 
       <div className="mt-6">
         {products.length > 0 ? (
-          <ProductGrid products={products} />
+          <ProductGrid products={products} currency={currency} />
         ) : (
-          <div className="rounded-[28px] bg-card px-6 py-14 text-center">
+          <div className="rounded-(--store-radius) bg-card px-6 py-14 text-center">
             <p className="font-semibold">No products found</p>
             <Link href="/products" className="mt-3 inline-block text-sm font-semibold text-primary hover:underline">
               See all products

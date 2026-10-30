@@ -12,15 +12,15 @@ import { useCart } from "./cart-provider";
 export type CheckoutProvider = { id: string; label: string; description: string; demo: boolean };
 
 export function CheckoutForm({ providers, email }: { providers: CheckoutProvider[]; email: string }) {
-  const { items, ready, totalCents } = useCart();
+  const { items, ready, totalCents, currency } = useCart();
   const [state, action, pending] = useActionState(placeOrder, undefined);
   const [provider, setProvider] = useState(providers[0]?.id ?? "");
 
-  if (!ready) return <div className="h-60 animate-pulse rounded-[28px] bg-card" />;
+  if (!ready) return <div className="h-60 animate-pulse rounded-(--store-radius) bg-card" />;
 
   if (items.length === 0) {
     return (
-      <div className="rounded-[28px] bg-card px-6 py-14 text-center">
+      <div className="rounded-(--store-radius) bg-card px-6 py-14 text-center">
         <p className="font-semibold">Your cart is empty</p>
         <Link href="/products" className="mt-3 inline-block text-sm font-semibold text-primary hover:underline">
           Browse the catalog
@@ -35,14 +35,14 @@ export function CheckoutForm({ providers, email }: { providers: CheckoutProvider
     <form action={action} className="grid gap-6 lg:grid-cols-[1fr_380px]">
       <input type="hidden" name="cart" value={cart} />
       <div className="space-y-6">
-        <section className="rounded-[28px] bg-card p-6">
+        <section className="rounded-(--store-radius) bg-card p-6">
           <h2 className="font-semibold">Delivery</h2>
           <p className="mt-2 text-sm text-muted-foreground">
             Your order details will be on the order page and sent to <span className="font-medium text-foreground">{email}</span>.
           </p>
         </section>
 
-        <fieldset className="rounded-[28px] bg-card p-6">
+        <fieldset className="rounded-(--store-radius) bg-card p-6">
           <legend className="sr-only">Payment method</legend>
           <h2 className="font-semibold">Payment method</h2>
           {providers.length === 0 ? (
@@ -83,7 +83,7 @@ export function CheckoutForm({ providers, email }: { providers: CheckoutProvider
         </fieldset>
       </div>
 
-      <aside className="h-fit rounded-[28px] bg-card p-6 lg:sticky lg:top-20">
+      <aside className="h-fit rounded-(--store-radius) bg-card p-6 lg:sticky lg:top-20">
         <h2 className="font-semibold">Order summary</h2>
         <ul className="mt-4 space-y-3">
           {items.map((item) => {
@@ -96,14 +96,14 @@ export function CheckoutForm({ providers, email }: { providers: CheckoutProvider
                 <span className="min-w-0 flex-1 truncate">
                   {item.name} <span className="text-muted-foreground">× {item.quantity}</span>
                 </span>
-                <span className="tabular-nums">{formatPrice(item.priceCents * item.quantity)}</span>
+                <span className="tabular-nums">{formatPrice(item.priceCents * item.quantity, currency)}</span>
               </li>
             );
           })}
         </ul>
         <div className="mt-4 flex justify-between border-t border-border/70 pt-3 font-semibold">
           <span>Total</span>
-          <span className="tabular-nums">{formatPrice(totalCents)}</span>
+          <span className="tabular-nums">{formatPrice(totalCents, currency)}</span>
         </div>
         {state?.error && (
           <p role="alert" className="mt-4 rounded-xl bg-destructive/10 px-3 py-2 text-sm text-destructive">

@@ -1,13 +1,14 @@
 import { createHmac, createVerify, randomBytes } from "node:crypto";
+import type { StoreSettings } from "../settings-shared";
 import type { PaymentProvider } from "./types";
 
 // Docs: https://developers.binance.com/docs/binance-pay/introduction
 const API_BASE = "https://bpay.binancepay.com";
 
-// Binance Pay charges in crypto, so EUR totals are converted with a rate you set and update.
-const usdtPerEur = () => Number(process.env.BINANCE_PAY_USDT_PER_EUR);
-
-const toUsdt = (cents: number) => Math.round((cents / 100) * usdtPerEur() * 100) / 100;
+// Binance Pay charges in USDT, so store prices are converted with a rate the admin sets in Settings
+// (USDT per 1 unit of the store currency). BINANCE_PAY_USDT_PER_EUR is the fallback.
+export const binanceUsdtRate = (settings: StoreSettings) =>
+  Number(settings.binanceUsdtRate || process.env.BINANCE_PAY_USDT_PER_EUR) || 0;
 
 async function signedRequest<T>(path: string, body: unknown): Promise<T> {
   const payload = JSON.stringify(body);
@@ -40,17 +41,19 @@ export const binancePay: PaymentProvider = {
   id: "binance",
   label: "Binance Pay",
   description: "Pay in USDT from your Binance account or wallet app.",
-  isConfigured: () =>
-    Boolean(process.env.BINANCE_PAY_API_KEY && process.env.BINANCE_PAY_SECRET_KEY && usdtPerEur() > 0),
+  isConfigured: () => Boolean(process.env.BINANCE_PAY_API_KEY && process.env.BINANCE_PAY_SECRET_KEY),
 
-  async createPayment({ order, items, baseUrl }) {
+  async createPayment({ order, items, baseUrl, settings }) {
+    const rate = binanceUsdtRate(settings);
+    if (rate <= 0) throw new Error("Binance Pay needs a USDT rate: set it in admin Settings.");
+    const toUsdt = (cents: number) => Math.round((cents / 100) * rate * 100) / 100;
     const amount = toUsdt(order.totalCents);
     const data = await signedRequest<{ prepayId: string; checkoutUrl: string }>("/binancepay/openapi/v3/order", {
       env: { terminalType: "WEB" },
       merchantTradeNo: order.publicId,
       orderAmount: amount,
       currency: "USDT",
-      description: `Diginest order ${order.publicId}`,
+      description: `${settings.storeName} order ${order.publicId}`,
       goodsDetails: items.map((item, index) => ({
         goodsType: "02",
         goodsCategory: "Z000",

@@ -7,15 +7,15 @@ import { formatPrice } from "@/lib/money";
 import { useCart } from "./cart-provider";
 
 export function CartView({ signedIn }: { signedIn: boolean }) {
-  const { items, ready, totalCents, setQuantity, remove } = useCart();
+  const { items, ready, totalCents, currency, setQuantity, remove } = useCart();
 
   if (!ready) {
-    return <div className="h-60 animate-pulse rounded-[28px] bg-card" />;
+    return <div className="h-60 animate-pulse rounded-(--store-radius) bg-card" />;
   }
 
   if (items.length === 0) {
     return (
-      <div className="rounded-[28px] bg-card px-6 py-16 text-center">
+      <div className="rounded-(--store-radius) bg-card px-6 py-16 text-center">
         <ShoppingBag className="mx-auto size-10 text-muted-foreground" />
         <p className="mt-3 font-semibold">Your cart is empty</p>
         <Link
@@ -31,7 +31,7 @@ export function CartView({ signedIn }: { signedIn: boolean }) {
 
   return (
     <div className="grid gap-6 lg:grid-cols-[1fr_360px]">
-      <ul className="divide-y divide-border/70 rounded-[28px] bg-card px-4 sm:px-6">
+      <ul className="divide-y divide-border/70 rounded-(--store-radius) bg-card px-4 sm:px-6">
         {items.map((item) => {
           const Icon = getIcon(item.icon);
           return (
@@ -43,7 +43,7 @@ export function CartView({ signedIn }: { signedIn: boolean }) {
                 <Link href={`/products/${item.slug}`} className="line-clamp-2 text-sm font-semibold hover:text-primary">
                   {item.name}
                 </Link>
-                <p className="mt-0.5 text-xs text-muted-foreground tabular-nums">{formatPrice(item.priceCents)} each</p>
+                <p className="mt-0.5 text-xs text-muted-foreground tabular-nums">{formatPrice(item.priceCents, currency)} each</p>
               </div>
               <div className="inline-flex items-center rounded-full border border-border">
                 <button
@@ -66,7 +66,7 @@ export function CartView({ signedIn }: { signedIn: boolean }) {
                 </button>
               </div>
               <span className="w-20 text-end text-sm font-semibold tabular-nums">
-                {formatPrice(item.priceCents * item.quantity)}
+                {formatPrice(item.priceCents * item.quantity, currency)}
               </span>
               <button
                 type="button"
@@ -81,16 +81,16 @@ export function CartView({ signedIn }: { signedIn: boolean }) {
         })}
       </ul>
 
-      <aside className="h-fit rounded-[28px] bg-card p-6 lg:sticky lg:top-20">
+      <aside className="h-fit rounded-(--store-radius) bg-card p-6 lg:sticky lg:top-20">
         <h2 className="font-semibold">Summary</h2>
         <dl className="mt-4 space-y-2 text-sm">
           <div className="flex justify-between">
             <dt className="text-muted-foreground">Subtotal</dt>
-            <dd className="tabular-nums">{formatPrice(totalCents)}</dd>
+            <dd className="tabular-nums">{formatPrice(totalCents, currency)}</dd>
           </div>
           <div className="flex justify-between border-t border-border/70 pt-2 text-base font-semibold">
             <dt>Total</dt>
-            <dd className="tabular-nums">{formatPrice(totalCents)}</dd>
+            <dd className="tabular-nums">{formatPrice(totalCents, currency)}</dd>
           </div>
         </dl>
         <Link

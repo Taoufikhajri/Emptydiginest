@@ -18,6 +18,7 @@ type CartContextValue = {
   count: number;
   totalCents: number;
   ready: boolean;
+  currency: string;
   add: (item: Omit<CartItem, "quantity">, quantity?: number) => void;
   setQuantity: (productId: number, quantity: number) => void;
   remove: (productId: number) => void;
@@ -45,7 +46,7 @@ const consumeClearCartCookie = () => {
   return true;
 };
 
-export function CartProvider({ children }: { children: React.ReactNode }) {
+export function CartProvider({ currency, children }: { currency: string; children: React.ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
   const [ready, setReady] = useState(false);
 
@@ -105,6 +106,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     () => ({
       items,
       ready,
+      currency,
       count: items.reduce((sum, item) => sum + item.quantity, 0),
       totalCents: items.reduce((sum, item) => sum + item.priceCents * item.quantity, 0),
       add,
@@ -112,7 +114,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       remove,
       clear,
     }),
-    [items, ready, add, setQuantity, remove, clear],
+    [items, ready, currency, add, setQuantity, remove, clear],
   );
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;

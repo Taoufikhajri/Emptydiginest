@@ -41,7 +41,7 @@ export default async function OrderPage({ params, searchParams }: Props) {
       </p>
 
       {order.status === "pending" && (
-        <section className="mt-6 rounded-[28px] border border-amber-200 bg-amber-50 p-6">
+        <section className="mt-6 rounded-(--store-radius) border border-amber-200 bg-amber-50 p-6">
           <h2 className="font-semibold">Waiting for payment</h2>
           {paymentError && (
             <p className="mt-2 text-sm text-destructive">
@@ -51,7 +51,7 @@ export default async function OrderPage({ params, searchParams }: Props) {
           {order.paymentUrl && (
             <>
               <p className="mt-2 text-sm text-muted-foreground">
-                Finish paying {order.paymentAmount ? <strong>{order.paymentAmount}</strong> : formatPrice(order.totalCents)}{" "}
+                Finish paying {order.paymentAmount ? <strong>{order.paymentAmount}</strong> : formatPrice(order.totalCents, order.currency)}{" "}
                 with {providerLabel}. This page updates once the payment is confirmed.
               </p>
               <a
@@ -82,7 +82,7 @@ export default async function OrderPage({ params, searchParams }: Props) {
       )}
 
       {order.status === "paid" && (
-        <section className="mt-6 rounded-[28px] bg-blue-50 p-6">
+        <section className="mt-6 rounded-(--store-radius) bg-blue-50 p-6">
           <h2 className="font-semibold">Payment received</h2>
           <p className="mt-2 text-sm text-muted-foreground">
             Thanks! We&apos;re preparing your delivery. It will appear here as soon as it&apos;s ready.
@@ -91,7 +91,7 @@ export default async function OrderPage({ params, searchParams }: Props) {
       )}
 
       {order.status === "delivered" && (
-        <section className="mt-6 rounded-[28px] border border-signal-emerald/30 bg-signal-emerald/5 p-6">
+        <section className="mt-6 rounded-(--store-radius) border border-signal-emerald/30 bg-signal-emerald/5 p-6">
           <h2 className="flex items-center gap-2 font-semibold">
             <PackageCheck className="size-5 text-signal-emerald" />
             Your delivery
@@ -102,7 +102,7 @@ export default async function OrderPage({ params, searchParams }: Props) {
         </section>
       )}
 
-      <section className="mt-6 rounded-[28px] bg-card p-6">
+      <section className="mt-6 rounded-(--store-radius) bg-card p-6">
         <h2 className="font-semibold">Items</h2>
         <ul className="mt-4 divide-y divide-border/70">
           {items.map((item) => (
@@ -117,13 +117,13 @@ export default async function OrderPage({ params, searchParams }: Props) {
                 )}
                 <span className="text-muted-foreground"> × {item.quantity}</span>
               </span>
-              <span className="tabular-nums">{formatPrice(item.unitPriceCents * item.quantity)}</span>
+              <span className="tabular-nums">{formatPrice(item.unitPriceCents * item.quantity, order.currency)}</span>
             </li>
           ))}
         </ul>
         <div className="mt-2 flex justify-between border-t border-border/70 pt-3 font-semibold">
           <span>Total</span>
-          <span className="tabular-nums">{formatPrice(order.totalCents)}</span>
+          <span className="tabular-nums">{formatPrice(order.totalCents, order.currency)}</span>
         </div>
       </section>
     </div>

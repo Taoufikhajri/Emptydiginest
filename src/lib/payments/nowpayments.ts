@@ -11,7 +11,7 @@ export const nowPayments: PaymentProvider = {
   description: "Pay with BTC, ETH, USDT and 300+ other coins.",
   isConfigured: () => Boolean(process.env.NOWPAYMENTS_API_KEY && process.env.NOWPAYMENTS_IPN_SECRET),
 
-  async createPayment({ order, baseUrl }) {
+  async createPayment({ order, baseUrl, settings }) {
     const response = await fetch(`${apiBase()}/invoice`, {
       method: "POST",
       headers: {
@@ -22,7 +22,7 @@ export const nowPayments: PaymentProvider = {
         price_amount: order.totalCents / 100,
         price_currency: order.currency.toLowerCase(),
         order_id: order.publicId,
-        order_description: `Diginest order ${order.publicId}`,
+        order_description: `${settings.storeName} order ${order.publicId}`,
         ipn_callback_url: `${baseUrl}/api/webhooks/nowpayments`,
         success_url: `${baseUrl}/orders/${order.publicId}`,
         cancel_url: `${baseUrl}/orders/${order.publicId}`,

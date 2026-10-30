@@ -33,7 +33,7 @@ export function OrdersTable({ orders }: { orders: Order[] }) {
               <td className="px-5 py-3">
                 <OrderStatusBadge status={order.status} short />
               </td>
-              <td className="px-5 py-3 text-end font-semibold tabular-nums">{formatPrice(order.totalCents)}</td>
+              <td className="px-5 py-3 text-end font-semibold tabular-nums">{formatPrice(order.totalCents, order.currency)}</td>
             </tr>
           ))}
         </tbody>

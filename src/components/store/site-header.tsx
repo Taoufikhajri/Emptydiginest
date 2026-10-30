@@ -5,6 +5,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { ChevronDown, LayoutDashboard, Menu, Search, ShoppingBag, User, X } from "lucide-react";
 import { logout } from "@/app/actions/auth";
+import { CURRENCY_COOKIE } from "@/lib/currency";
 import { cn } from "@/lib/utils";
 import { BrandMark } from "./brand-mark";
 import { useCart } from "./cart-provider";
@@ -13,15 +14,17 @@ export type StoreBrand = { name: string; logoUrl: string | null; showName: boole
 
 type SiteHeaderProps = {
   brand: StoreBrand;
+  // Currencies visitors can switch prices to; null when local prices are turned off.
+  currencyOptions: string[] | null;
   categories: { slug: string; name: string }[];
   user: { name: string; role: string } | null;
 };
 
-export function SiteHeader({ brand, categories, user }: SiteHeaderProps) {
+export function SiteHeader({ brand, currencyOptions, categories, user }: SiteHeaderProps) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const { count, ready } = useCart();
+  const { count, ready, pricing } = useCart();
   const [browseOpen, setBrowseOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
@@ -91,6 +94,30 @@ export function SiteHeader({ brand, categories, user }: SiteHeaderProps) {
     </form>
   );
 
+  const chooseCurrency = (code: string) => {
+    document.cookie = `${CURRENCY_COOKIE}=${code}; path=/; max-age=31536000; samesite=lax`;
+    router.refresh();
+  };
+
+  const currencyPicker = (className: string) =>
+    currencyOptions && (
+      <label className={cn("relative", className)}>
+        <span className="sr-only">Currency</span>
+        <select
+          value={pricing.display}
+          onChange={(event) => chooseCurrency(event.target.value)}
+          className="h-9 cursor-pointer appearance-none rounded-full border border-border bg-card ps-3 pe-7 text-xs font-semibold text-foreground hover:bg-secondary focus:border-primary focus:outline-none"
+        >
+          {currencyOptions.map((code) => (
+            <option key={code} value={code}>
+              {code}
+            </option>
+          ))}
+        </select>
+        <ChevronDown className="pointer-events-none absolute end-2 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground" />
+      </label>
+    );
+
   const cartLink = (
     <Link
       href="/cart"
@@ -99,7 +126,10 @@ export function SiteHeader({ brand, categories, user }: SiteHeaderProps) {
     >
       <ShoppingBag className="size-5" />
       {ready && count > 0 && (
-        <span className="absolute end-0.5 top-0.5 grid min-w-[18px] place-items-center rounded-full bg-primary px-1 text-[10px] leading-[18px] font-semibold text-primary-foreground">
+        <span
+          key={count}
+          className="badge-pop absolute end-0 top-0 grid min-w-[19px] place-items-center rounded-full bg-badge px-1 text-[10px] leading-[19px] font-bold text-badge-foreground shadow-[0_2px_6px_-1px_var(--badge)] ring-2 ring-background"
+        >
           {count}
         </span>
       )}
@@ -161,6 +191,7 @@ export function SiteHeader({ brand, categories, user }: SiteHeaderProps) {
           >
             <Search className="size-5" />
           </button>
+          {currencyPicker("hidden sm:block")}
           {cartLink}
           {user ? (
             <div className="hidden items-center gap-1 lg:flex">
@@ -219,6 +250,12 @@ export function SiteHeader({ brand, categories, user }: SiteHeaderProps) {
             </Link>
           ))}
           <div className="my-2 h-px bg-border" />
+          {currencyOptions && (
+            <div className="flex items-center justify-between px-2 py-1.5 text-[15px] sm:hidden">
+              Currency
+              {currencyPicker("")}
+            </div>
+          )}
           <Link href="/guarantee" className="block rounded-xl px-2 py-2.5 text-[15px] hover:bg-secondary">
             Guarantee
           </Link>

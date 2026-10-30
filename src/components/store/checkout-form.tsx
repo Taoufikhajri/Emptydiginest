@@ -5,14 +5,14 @@ import { useActionState, useState } from "react";
 import { Loader2, Lock } from "lucide-react";
 import { placeOrder } from "@/app/actions/checkout";
 import { ProductVisual } from "@/components/product-visual";
-import { formatPrice } from "@/lib/money";
+import { formatMoney, formatShopPrice } from "@/lib/currency";
 import { cn } from "@/lib/utils";
 import { useCart } from "./cart-provider";
 
 export type CheckoutProvider = { id: string; label: string; description: string; demo: boolean };
 
 export function CheckoutForm({ providers, email }: { providers: CheckoutProvider[]; email: string }) {
-  const { items, ready, totalCents, currency } = useCart();
+  const { items, ready, totalCents, pricing } = useCart();
   const [state, action, pending] = useActionState(placeOrder, undefined);
   const [provider, setProvider] = useState(providers[0]?.id ?? "");
 
@@ -95,15 +95,21 @@ export function CheckoutForm({ providers, email }: { providers: CheckoutProvider
                 <span className="min-w-0 flex-1 truncate">
                   {item.name} <span className="text-muted-foreground">× {item.quantity}</span>
                 </span>
-                <span className="tabular-nums">{formatPrice(item.priceCents * item.quantity, currency)}</span>
+                <span className="tabular-nums">{formatShopPrice(item.priceCents * item.quantity, pricing)}</span>
               </li>
             );
           })}
         </ul>
         <div className="mt-4 flex justify-between border-t border-border/70 pt-3 font-semibold">
           <span>Total</span>
-          <span className="tabular-nums">{formatPrice(totalCents, currency)}</span>
+          <span className="tabular-nums">{formatShopPrice(totalCents, pricing)}</span>
         </div>
+        {pricing.display !== pricing.store && (
+          <div className="mt-2 flex justify-between rounded-xl bg-secondary px-3 py-2 text-sm">
+            <span>You&apos;ll be charged</span>
+            <span className="font-semibold tabular-nums">{formatMoney(totalCents, pricing.store)}</span>
+          </div>
+        )}
         {state?.error && (
           <p role="alert" className="mt-4 rounded-xl bg-destructive/10 px-3 py-2 text-sm text-destructive">
             {state.error}

@@ -53,5 +53,5 @@ export async function getLogo() {
 export function themeCss(settings: StoreSettings) {
   const corners = cornerStyles.find((style) => style.id === settings.corners) ?? cornerStyles[0];
   const font = fonts.find((option) => option.id === settings.font) ?? fonts[0];
-  return `:root{--primary:${settings.primaryColor};--primary-foreground:${readableTextOn(settings.primaryColor)};--ring:${settings.primaryColor};--background:${settings.backgroundColor};--secondary:${settings.backgroundColor};--muted:${settings.backgroundColor};--accent:${settings.backgroundColor};--store-radius:${corners.cardRadius};--radius:${corners.uiRadius};--store-font:var(${font.cssVar})}`;
+  return `:root{--primary:${settings.primaryColor};--primary-foreground:${readableTextOn(settings.primaryColor)};--ring:${settings.primaryColor};--badge:${settings.badgeColor};--badge-foreground:${readableTextOn(settings.badgeColor)};--background:${settings.backgroundColor};--secondary:${settings.backgroundColor};--muted:${settings.backgroundColor};--accent:${settings.backgroundColor};--store-radius:${corners.cardRadius};--radius:${corners.uiRadius};--store-font:var(${font.cssVar})}`;
 }

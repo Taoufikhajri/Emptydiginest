@@ -1,6 +1,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
+import type { Pricing } from "@/lib/currency";
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 
 export type CartItem = {
@@ -19,7 +20,7 @@ type CartContextValue = {
   count: number;
   totalCents: number;
   ready: boolean;
-  currency: string;
+  pricing: Pricing;
   add: (item: Omit<CartItem, "quantity">, quantity?: number) => void;
   setQuantity: (productId: number, quantity: number) => void;
   remove: (productId: number) => void;
@@ -47,7 +48,7 @@ const consumeClearCartCookie = () => {
   return true;
 };
 
-export function CartProvider({ currency, children }: { currency: string; children: React.ReactNode }) {
+export function CartProvider({ pricing, children }: { pricing: Pricing; children: React.ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
   const [ready, setReady] = useState(false);
 
@@ -107,7 +108,7 @@ export function CartProvider({ currency, children }: { currency: string; childre
     () => ({
       items,
       ready,
-      currency,
+      pricing,
       count: items.reduce((sum, item) => sum + item.quantity, 0),
       totalCents: items.reduce((sum, item) => sum + item.priceCents * item.quantity, 0),
       add,
@@ -115,7 +116,7 @@ export function CartProvider({ currency, children }: { currency: string; childre
       remove,
       clear,
     }),
-    [items, ready, currency, add, setQuantity, remove, clear],
+    [items, ready, pricing, add, setQuantity, remove, clear],
   );
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;

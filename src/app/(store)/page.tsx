@@ -4,7 +4,8 @@ import { CategoryChips } from "@/components/store/category-chips";
 import { Guarantee } from "@/components/store/guarantee";
 import { Hero, type HeroSlide } from "@/components/store/hero";
 import { ProductGrid } from "@/components/store/product-card";
-import { formatPrice } from "@/lib/money";
+import { formatShopPrice } from "@/lib/currency";
+import { getPricing } from "@/lib/pricing";
 import { getCategories, getProducts } from "@/lib/queries";
 import { getSettings } from "@/lib/settings";
 
@@ -15,6 +16,7 @@ export default async function HomePage() {
     getProducts(),
     getSettings(),
   ]);
+  const pricing = await getPricing();
   const { sections } = settings;
   const showcase = featured.length > 0 ? featured : all.slice(0, 8);
 
@@ -31,7 +33,7 @@ export default async function HomePage() {
         key: `card-${index}`,
         label: card.label,
         title: card.title || product.name,
-        detail: card.detail || formatPrice(product.priceCents, settings.currency),
+        detail: card.detail || formatShopPrice(product.priceCents, pricing),
         largeDetail: !card.detail,
         href: `/products/${product.slug}`,
         cartItem:
@@ -66,7 +68,7 @@ export default async function HomePage() {
             key: product.slug,
             label: "",
             title: product.name,
-            detail: formatPrice(product.priceCents, settings.currency),
+            detail: formatShopPrice(product.priceCents, pricing),
             largeDetail: true,
             href: `/products/${product.slug}`,
           })),
@@ -108,7 +110,7 @@ export default async function HomePage() {
           {sections.popular && (
             <div className="mt-6">
               {showcase.length > 0 ? (
-                <ProductGrid products={showcase} currency={settings.currency} />
+                <ProductGrid products={showcase} pricing={pricing} />
               ) : (
                 <p className="rounded-(--store-radius) bg-card px-6 py-14 text-center text-muted-foreground">
                   No products yet. Add some from the admin dashboard.

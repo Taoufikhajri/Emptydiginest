@@ -5,9 +5,10 @@ import { Check, Mail, ShieldCheck, Zap } from "lucide-react";
 import { ProductGrid } from "@/components/store/product-card";
 import { ProductPurchase } from "@/components/store/product-purchase";
 import { ProductVisual } from "@/components/product-visual";
-import { discountPercent, formatPrice } from "@/lib/money";
+import { formatShopPrice } from "@/lib/currency";
+import { discountPercent } from "@/lib/money";
 import { getProductBySlug, getRelatedProducts } from "@/lib/queries";
-import { getSettings } from "@/lib/settings";
+import { getPricing } from "@/lib/pricing";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -26,7 +27,7 @@ export default async function ProductPage({ params }: Props) {
   const product = await getProductBySlug((await params).slug);
   if (!product) notFound();
 
-  const [related, { currency }] = await Promise.all([getRelatedProducts(product), getSettings()]);
+  const [related, pricing] = await Promise.all([getRelatedProducts(product), getPricing()]);
   const discount = discountPercent(product.priceCents, product.compareAtCents);
 
   return (
@@ -75,10 +76,10 @@ export default async function ProductPage({ params }: Props) {
           )}
 
           <div className="mt-5 flex flex-wrap items-baseline gap-3">
-            <span className="text-3xl font-semibold tracking-tight tabular-nums">{formatPrice(product.priceCents, currency)}</span>
+            <span className="text-3xl font-semibold tracking-tight tabular-nums">{formatShopPrice(product.priceCents, pricing)}</span>
             {discount > 0 && product.compareAtCents && (
               <>
-                <span className="text-muted-foreground tabular-nums line-through">{formatPrice(product.compareAtCents, currency)}</span>
+                <span className="text-muted-foreground tabular-nums line-through">{formatShopPrice(product.compareAtCents, pricing)}</span>
                 <span className="rounded bg-signal-emerald/10 px-2 py-0.5 text-xs font-semibold text-signal-emerald">
                   {discount}% off
                 </span>
@@ -139,7 +140,7 @@ export default async function ProductPage({ params }: Props) {
             More in {product.categoryName ?? "the store"}
           </h2>
           <div className="mt-4">
-            <ProductGrid products={related} currency={currency} />
+            <ProductGrid products={related} pricing={pricing} />
           </div>
         </section>
       )}

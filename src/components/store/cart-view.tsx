@@ -3,11 +3,11 @@
 import Link from "next/link";
 import { ArrowRight, Minus, Plus, ShoppingBag, Trash2 } from "lucide-react";
 import { ProductVisual } from "@/components/product-visual";
-import { formatPrice } from "@/lib/money";
+import { formatMoney, formatShopPrice } from "@/lib/currency";
 import { useCart } from "./cart-provider";
 
 export function CartView({ signedIn }: { signedIn: boolean }) {
-  const { items, ready, totalCents, currency, setQuantity, remove } = useCart();
+  const { items, ready, totalCents, pricing, setQuantity, remove } = useCart();
 
   if (!ready) {
     return <div className="h-60 animate-pulse rounded-(--store-radius) bg-card" />;
@@ -42,7 +42,7 @@ export function CartView({ signedIn }: { signedIn: boolean }) {
                 <Link href={`/products/${item.slug}`} className="line-clamp-2 text-sm font-semibold hover:text-primary">
                   {item.name}
                 </Link>
-                <p className="mt-0.5 text-xs text-muted-foreground tabular-nums">{formatPrice(item.priceCents, currency)} each</p>
+                <p className="mt-0.5 text-xs text-muted-foreground tabular-nums">{formatShopPrice(item.priceCents, pricing)} each</p>
               </div>
               <div className="inline-flex items-center rounded-full border border-border">
                 <button
@@ -65,7 +65,7 @@ export function CartView({ signedIn }: { signedIn: boolean }) {
                 </button>
               </div>
               <span className="w-20 text-end text-sm font-semibold tabular-nums">
-                {formatPrice(item.priceCents * item.quantity, currency)}
+                {formatShopPrice(item.priceCents * item.quantity, pricing)}
               </span>
               <button
                 type="button"
@@ -85,12 +85,17 @@ export function CartView({ signedIn }: { signedIn: boolean }) {
         <dl className="mt-4 space-y-2 text-sm">
           <div className="flex justify-between">
             <dt className="text-muted-foreground">Subtotal</dt>
-            <dd className="tabular-nums">{formatPrice(totalCents, currency)}</dd>
+            <dd className="tabular-nums">{formatShopPrice(totalCents, pricing)}</dd>
           </div>
           <div className="flex justify-between border-t border-border/70 pt-2 text-base font-semibold">
             <dt>Total</dt>
-            <dd className="tabular-nums">{formatPrice(totalCents, currency)}</dd>
+            <dd className="tabular-nums">{formatShopPrice(totalCents, pricing)}</dd>
           </div>
+          {pricing.display !== pricing.store && (
+            <p className="text-xs text-muted-foreground">
+              Approximate. You&apos;ll be charged {formatMoney(totalCents, pricing.store)} ({pricing.store}).
+            </p>
+          )}
         </dl>
         <Link
           href={signedIn ? "/checkout" : "/login?next=/checkout"}

@@ -1,7 +1,7 @@
 "use client";
 
 import { startTransition, useActionState, useEffect, useRef, useState } from "react";
-import { Check, Loader2, RotateCcw } from "lucide-react";
+import { Check, Loader2, RotateCcw, ShoppingBag } from "lucide-react";
 import { updateSettings } from "@/app/actions/settings";
 import {
   cornerStyles,
@@ -33,6 +33,7 @@ export function SettingsForm({ values, logoUrl, envBinanceRate, products }: Sett
   const [currency, setCurrency] = useState(values.currency);
   const [primaryColor, setPrimaryColor] = useState(values.primaryColor);
   const [backgroundColor, setBackgroundColor] = useState(values.backgroundColor);
+  const [badgeColor, setBadgeColor] = useState(values.badgeColor);
   const [font, setFont] = useState(values.font);
   const [corners, setCorners] = useState(values.corners);
   const [heroCardStyle, setHeroCardStyle] = useState(values.heroCardStyle);
@@ -59,6 +60,7 @@ export function SettingsForm({ values, logoUrl, envBinanceRate, products }: Sett
   const resetDesign = () => {
     setPrimaryColor(defaultDesign.primaryColor);
     setBackgroundColor(defaultDesign.backgroundColor);
+    setBadgeColor(defaultDesign.badgeColor);
     setFont(defaultDesign.font);
     setCorners(defaultDesign.corners);
     setHeroCardStyle(defaultDesign.heroCardStyle);
@@ -163,6 +165,16 @@ export function SettingsForm({ values, logoUrl, envBinanceRate, products }: Sett
               />
             </label>
           </div>
+          <label className="flex items-start gap-2.5 rounded-xl border border-border px-3 py-2.5 text-sm">
+            <input type="checkbox" name="localCurrency" defaultChecked={values.localCurrency} className={checkboxClass} />
+            <span>
+              <span className="block font-medium">Show prices in the visitor&apos;s local currency</span>
+              <span className="block text-xs text-muted-foreground">
+                Detected from their country or browser language, with a currency picker in the header. Uses fixed exchange
+                rates; orders are still charged in {currency}.
+              </span>
+            </span>
+          </label>
           {currencyChanged && (
             <p className="rounded-xl bg-amber-500/10 px-3 py-2 text-sm text-amber-800">
               Product prices are not converted. A product priced 19.99 {values.currency} will show as 19.99 {currency}, so
@@ -210,6 +222,7 @@ export function SettingsForm({ values, logoUrl, envBinanceRate, products }: Sett
           <div className="grid gap-4 sm:grid-cols-2">
             <ColorField label="Brand color" name="primaryColor" value={primaryColor} onChange={setPrimaryColor} />
             <ColorField label="Page background" name="backgroundColor" value={backgroundColor} onChange={setBackgroundColor} />
+            <ColorField label="Cart badge" name="badgeColor" value={badgeColor} onChange={setBadgeColor} />
             <label className="block text-sm font-medium">
               Font
               <select name="font" value={font} onChange={(event) => setFont(event.target.value as StoreSettings["font"])} className={inputClass}>
@@ -272,12 +285,23 @@ export function SettingsForm({ values, logoUrl, envBinanceRate, products }: Sett
               <p className="text-sm font-semibold text-[#0b0b0c]">Product card</p>
               <p className="text-xs text-[#5f5c5b]">Corners, font and colors</p>
             </div>
-            <span
-              className="inline-flex h-9 items-center rounded-full px-4 text-sm font-semibold"
-              style={{ background: primaryColor, color: readableTextOn(primaryColor) }}
-            >
-              Add to cart
-            </span>
+            <div className="flex items-center gap-4">
+              <span
+                className="inline-flex h-9 items-center rounded-full px-4 text-sm font-semibold"
+                style={{ background: primaryColor, color: readableTextOn(primaryColor) }}
+              >
+                Add to cart
+              </span>
+              <span className="relative grid size-9 place-items-center text-[#0b0b0c]" aria-label="Cart badge preview">
+                <ShoppingBag className="size-5" />
+                <span
+                  className="absolute -end-0.5 -top-0.5 grid min-w-[18px] place-items-center rounded-full px-1 text-[10px] leading-[18px] font-bold ring-2 ring-white"
+                  style={{ background: badgeColor, color: readableTextOn(isHexColor(badgeColor) ? badgeColor : "#000000") }}
+                >
+                  3
+                </span>
+              </span>
+            </div>
           </div>
         </div>
         {state?.error && (

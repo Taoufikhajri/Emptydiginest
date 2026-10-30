@@ -40,6 +40,8 @@
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
   --color-signal-emerald: var(--signal-emerald);
+  --color-badge: var(--badge);
+  --color-badge-foreground: var(--badge-foreground);
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
@@ -68,6 +70,8 @@
   --border: #ebebeb;
   --input: #ebebeb;
   --ring: #5433eb;
+  --badge: #ff3d68;
+  --badge-foreground: #fff;
   --signal-emerald: #137a43;
   --chart-1: oklch(0.87 0 0);
   --chart-2: oklch(0.556 0 0);
@@ -160,4 +164,20 @@
 
 .no-scrollbar::-webkit-scrollbar {
   display: none;
+}
+/* Cart count bubble: pops when the count changes (keyed on the count in the header). */
+@keyframes badge-pop {
+  0% { transform: scale(0.4); }
+  60% { transform: scale(1.25); }
+  100% { transform: scale(1); }
+}
+
+.badge-pop {
+  animation: badge-pop 350ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .badge-pop {
+    animation: none;
+  }
 }

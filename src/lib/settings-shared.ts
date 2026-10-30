@@ -71,6 +71,8 @@ export type StoreSettings = {
   supportEmail: string;
   showNameWithLogo: boolean;
   currency: CurrencyCode;
+  // Show prices converted to the visitor's currency (orders are still charged in `currency`).
+  localCurrency: boolean;
   // USDT per 1 unit of the store currency. Empty means BINANCE_PAY_USDT_PER_EUR is used.
   binanceUsdtRate: string;
   announcement: string;
@@ -83,6 +85,8 @@ export type StoreSettings = {
   heroCards: HeroCard[];
   primaryColor: string;
   backgroundColor: string;
+  // Cart count bubble in the header: meant to stand out from the brand color.
+  badgeColor: string;
   font: FontId;
   corners: CornerStyle;
 };
@@ -90,6 +94,7 @@ export type StoreSettings = {
 export const defaultDesign = {
   primaryColor: "#5433eb",
   backgroundColor: "#f2f4f5",
+  badgeColor: "#ff3d68",
   font: "geist",
   corners: "round",
   heroCardStyle: "colorful",
@@ -102,6 +107,7 @@ export const defaultSettings: StoreSettings = {
   supportEmail: "support@diginest.example",
   showNameWithLogo: true,
   currency: "EUR",
+  localCurrency: true,
   binanceUsdtRate: "",
   announcement: "",
   sections: { hero: true, guarantee: true, categories: true, popular: true },

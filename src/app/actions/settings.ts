@@ -53,6 +53,7 @@ const settingsSchema = z.object({
   heroSubtitle: z.string().trim().max(200),
   heroCardStyle: z.enum(["colorful", "brand"]),
   primaryColor: hexColor("brand color"),
+  badgeColor: hexColor("cart badge color"),
   backgroundColor: hexColor("background color").refine(
     (value) => luminance(value) >= 0.6,
     "Pick a lighter background color so text stays readable.",
@@ -85,6 +86,8 @@ export async function updateSettings(_state: AdminFormState, formData: FormData)
     binanceUsdtRate: parsed.data.binanceUsdtRate.replace(",", "."),
     primaryColor: parsed.data.primaryColor.toLowerCase(),
     backgroundColor: parsed.data.backgroundColor.toLowerCase(),
+    badgeColor: parsed.data.badgeColor.toLowerCase(),
+    localCurrency: formData.get("localCurrency") === "on",
     showNameWithLogo: formData.get("showNameWithLogo") === "on",
     sections: Object.fromEntries(
       homeSections.map((section) => [section.id, formData.get(`section-${section.id}`) === "on"]),

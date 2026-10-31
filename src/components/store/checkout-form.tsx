@@ -34,12 +34,12 @@ export function CheckoutForm({ providers, email }: { providers: CheckoutProvider
   const cart = JSON.stringify(items.map(({ productId, quantity }) => ({ productId, quantity })));
 
   return (
-    <form action={action} className="grid gap-6 lg:grid-cols-[1fr_380px]">
+    <form action={action} className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_380px]">
       <input type="hidden" name="cart" value={cart} />
-      <div className="space-y-6">
+      <div className="min-w-0 space-y-6">
         <section className="rounded-(--store-radius) bg-card p-6">
           <h2 className="font-semibold">{t("checkout.delivery")}</h2>
-          <p className="mt-2 text-sm text-muted-foreground">
+          <p className="mt-2 text-sm break-words text-muted-foreground">
             {t("checkout.deliveryBody", { email })}
           </p>
         </section>
@@ -48,7 +48,7 @@ export function CheckoutForm({ providers, email }: { providers: CheckoutProvider
           <legend className="sr-only">{t("checkout.paymentMethod")}</legend>
           <h2 className="font-semibold">{t("checkout.paymentMethod")}</h2>
           {providers.length === 0 ? (
-            <p className="mt-3 text-sm text-destructive">{t("checkout.noProviders")}</p>
+            <p className="mt-3 text-sm break-words text-destructive">{t("checkout.noProviders")}</p>
           ) : (
             <div className="mt-4 grid gap-3">
               {providers.map((option) => (
@@ -85,7 +85,7 @@ export function CheckoutForm({ providers, email }: { providers: CheckoutProvider
         </fieldset>
       </div>
 
-      <aside className="h-fit rounded-(--store-radius) bg-card p-6 lg:sticky lg:top-20">
+      <aside className="h-fit min-w-0 rounded-(--store-radius) bg-card p-6 lg:sticky lg:top-20">
         <h2 className="font-semibold">{t("checkout.summary")}</h2>
         <ul className="mt-4 space-y-3">
           {items.map((item) => {
@@ -94,20 +94,20 @@ export function CheckoutForm({ providers, email }: { providers: CheckoutProvider
                 <span className="grid size-9 shrink-0 place-items-center overflow-hidden rounded-lg border border-border bg-secondary p-1">
                   <ProductVisual imageUrl={item.imageUrl} icon={item.icon} iconColor={item.iconColor} iconClassName="size-4" />
                 </span>
-                <span className="min-w-0 flex-1 truncate">
+                <span className="min-w-0 flex-1 break-words">
                   {item.name} <span className="text-muted-foreground">× {item.quantity}</span>
                 </span>
-                <span className="tabular-nums">{formatShopPrice(item.priceCents * item.quantity, pricing)}</span>
+                <span className="shrink-0 tabular-nums">{formatShopPrice(item.priceCents * item.quantity, pricing)}</span>
               </li>
             );
           })}
         </ul>
-        <div className="mt-4 flex justify-between border-t border-border/70 pt-3 font-semibold">
+        <div className="mt-4 flex justify-between gap-3 border-t border-border/70 pt-3 font-semibold">
           <span>{t("checkout.total")}</span>
           <span className="tabular-nums">{formatShopPrice(totalCents, pricing)}</span>
         </div>
         {pricing.display !== pricing.store && (
-          <div className="mt-2 flex justify-between rounded-xl bg-secondary px-3 py-2 text-sm">
+          <div className="mt-2 flex justify-between gap-3 rounded-xl bg-secondary px-3 py-2 text-sm">
             <span>{t("checkout.charged")}</span>
             <span className="font-semibold tabular-nums">{formatMoney(totalCents, pricing.store, pricing.intl)}</span>
           </div>

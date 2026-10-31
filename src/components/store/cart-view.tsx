@@ -32,15 +32,15 @@ export function CartView({ signedIn }: { signedIn: boolean }) {
   }
 
   return (
-    <div className="grid gap-6 lg:grid-cols-[1fr_360px]">
-      <ul className="divide-y divide-border/70 rounded-(--store-radius) bg-card px-4 sm:px-6">
+    <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_360px]">
+      <ul className="min-w-0 divide-y divide-border/70 rounded-(--store-radius) bg-card px-4 sm:px-6">
         {items.map((item) => {
           return (
             <li key={item.productId} className="flex flex-wrap items-center gap-4 py-5 sm:flex-nowrap">
               <div className="grid size-12 shrink-0 place-items-center overflow-hidden rounded-xl border border-border bg-secondary p-1.5">
                 <ProductVisual imageUrl={item.imageUrl} icon={item.icon} iconColor={item.iconColor} iconClassName="size-6" />
               </div>
-              <div className="min-w-0 flex-1">
+              <div className="min-w-0 flex-1 basis-[calc(100%-4rem)] sm:basis-auto">
                 <Link href={`/products/${item.slug}`} className="line-clamp-2 text-sm font-semibold hover:text-primary">
                   {item.name}
                 </Link>
@@ -66,7 +66,7 @@ export function CartView({ signedIn }: { signedIn: boolean }) {
                   <Plus className="size-3.5" />
                 </button>
               </div>
-              <span className="w-20 text-end text-sm font-semibold tabular-nums">
+              <span className="ms-auto min-w-20 text-end text-sm font-semibold whitespace-nowrap tabular-nums sm:ms-0">
                 {formatShopPrice(item.priceCents * item.quantity, pricing)}
               </span>
               <button
@@ -82,7 +82,7 @@ export function CartView({ signedIn }: { signedIn: boolean }) {
         })}
       </ul>
 
-      <aside className="h-fit rounded-(--store-radius) bg-card p-6 lg:sticky lg:top-20">
+      <aside className="h-fit min-w-0 rounded-(--store-radius) bg-card p-6 lg:sticky lg:top-20">
         <h2 className="font-semibold">{t("cart.summary")}</h2>
         <dl className="mt-4 space-y-2 text-sm">
           <div className="flex justify-between">

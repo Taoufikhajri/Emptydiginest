@@ -33,11 +33,16 @@ export type HeroIntroContent = {
   titleAccent: string;
   productName: string;
   productPrice: string;
+  // Product images shown on the floating tiles; tiles without one show an icon.
+  tileImages: string[];
 };
 
-// Scene timings in milliseconds.
+// Scene timings in milliseconds of timeline time; the timeline plays SPEED times faster than real time.
 const SCENES = { typing: 0, checkout: 3400, delivery: 7800, brand: 11400, end: 13600 };
-const FADE_MS = 500;
+const SPEED = 1.6;
+const FADE_MS = 400;
+// CSS transitions are written in real time, so shorten them to keep pace with the timeline.
+const realMs = (ms: number) => `${Math.round(ms / SPEED)}ms`;
 // The checkout and delivery scenes are drawn on a fixed 720×360 stage, scaled to fit the screen.
 const STAGE_W = 720;
 const STAGE_H = 360;
@@ -81,7 +86,7 @@ export function HeroIntro({ content, onDone }: { content: HeroIntroContent; onDo
     let frame = 0;
     let last = performance.now();
     const tick = (now: number) => {
-      setTime((current) => current + (now - last));
+      setTime((current) => current + (now - last) * SPEED);
       last = now;
       frame = requestAnimationFrame(tick);
     };
@@ -138,27 +143,35 @@ export function HeroIntro({ content, onDone }: { content: HeroIntroContent; onDo
   return (
     <div
       className={cn(
-        "absolute inset-0 z-20 flex flex-col items-center justify-center overflow-hidden bg-background px-4 transition-opacity duration-500",
+        "absolute inset-0 z-20 flex flex-col items-center justify-center overflow-hidden bg-background px-4 transition-opacity duration-[400ms]",
         leaving && "pointer-events-none opacity-0",
       )}
     >
       <div className="w-full max-w-5xl" style={{ opacity: sceneOpacity }}>
         {scene === "typing" && (
           <div className="relative mx-auto h-[min(70svh,520px)]">
-            {tiles.map(({ icon: Icon, color, x, y }, index) => (
-              <span
-                key={index}
-                className="intro-float absolute grid size-11 place-items-center rounded-xl bg-card shadow-[0_6px_16px_-6px_rgba(0,0,0,0.18)] sm:size-12"
-                style={{
-                  left: `${x}%`,
-                  top: `${y}%`,
-                  animationDelay: `${(index % 6) * -0.6}s`,
-                  opacity: progress(time, index * 90, 400),
-                }}
-              >
-                <Icon className="size-5" style={{ color }} />
-              </span>
-            ))}
+            {tiles.map(({ icon: Icon, color, x, y }, index) => {
+              const image = content.tileImages[index];
+              return (
+                <span
+                  key={index}
+                  className="intro-float absolute grid size-11 place-items-center overflow-hidden rounded-xl bg-card shadow-[0_6px_16px_-6px_rgba(0,0,0,0.18)] sm:size-12"
+                  style={{
+                    left: `${x}%`,
+                    top: `${y}%`,
+                    animationDelay: `${(index % 6) * -0.6}s`,
+                    opacity: progress(time, index * 90, 400),
+                  }}
+                >
+                  {image ? (
+                    // eslint-disable-next-line @next/next/no-img-element -- small product images from our own media route
+                    <img src={image} alt="" className="size-full object-contain p-1.5" />
+                  ) : (
+                    <Icon className="size-5" style={{ color }} />
+                  )}
+                </span>
+              );
+            })}
             <h2 className="absolute inset-x-0 top-1/2 -translate-y-1/2 px-6 text-center text-[clamp(1.75rem,5vw,3.5rem)] leading-[1.08] font-semibold tracking-[-0.03em] text-balance text-foreground">
               {content.titleLead}
               <br />
@@ -186,8 +199,8 @@ export function HeroIntro({ content, onDone }: { content: HeroIntroContent; onDo
                       </div>
                     </div>
                     <div
-                      className="absolute top-[30px] left-[340px] w-[360px] rounded-2xl bg-card p-5 shadow-[0_10px_30px_-12px_rgba(0,0,0,0.25)] transition-all duration-500"
-                      style={{ opacity: checkoutOpen ? 1 : 0, transform: `translateY(${checkoutOpen ? 0 : 16}px)` }}
+                      className="absolute top-[30px] left-[340px] w-[360px] rounded-2xl bg-card p-5 shadow-[0_10px_30px_-12px_rgba(0,0,0,0.25)] transition-all"
+                      style={{ transitionDuration: realMs(500), opacity: checkoutOpen ? 1 : 0, transform: `translateY(${checkoutOpen ? 0 : 16}px)` }}
                     >
                       <p className="font-semibold">{t("checkout.title")}</p>
                       <p className="mt-3 text-[11px] font-medium text-muted-foreground">{t("intro.email")}</p>
@@ -264,8 +277,8 @@ export function HeroIntro({ content, onDone }: { content: HeroIntroContent; onDo
                 <svg
                   viewBox="0 0 24 24"
                   aria-hidden="true"
-                  className="absolute size-6 drop-shadow transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]"
-                  style={{ left: cursor.x, top: cursor.y, transform: `scale(${clicking ? 0.85 : 1})` }}
+                  className="absolute size-6 drop-shadow transition-all ease-[cubic-bezier(0.22,1,0.36,1)]"
+                  style={{ transitionDuration: realMs(700), left: cursor.x, top: cursor.y, transform: `scale(${clicking ? 0.85 : 1})` }}
                 >
                   <path d="M4 2l15 9.5-6.6 1.3L9 19.6z" fill="#0b0b0c" stroke="#fff" strokeWidth="1.5" strokeLinejoin="round" />
                 </svg>

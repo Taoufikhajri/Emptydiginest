@@ -27,6 +27,8 @@ export default async function HomePage() {
   const showcase = featured.length > 0 ? featured : all.slice(0, 8);
   // The intro's checkout demo uses the first product shown on the home page.
   const introProduct = showcase[0];
+  // Uploaded product images, featured ones first, for the intro's floating tiles.
+  const tileImages = [...new Set([...showcase, ...all].flatMap((product) => (product.imageUrl ? [product.imageUrl] : [])))].slice(0, 12);
 
   // Cards chosen in admin Settings; hidden or deleted products are skipped.
   const chosenSlides = settings.heroCards.flatMap((card, index): HeroSlide[] => {
@@ -97,6 +99,7 @@ export default async function HomePage() {
                   titleAccent: settings.heroTitleAccent,
                   productName: introProduct?.name ?? t("hero.introTitle", { count: all.length }),
                   productPrice: introProduct ? formatShopPrice(introProduct.priceCents, pricing) : "",
+                  tileImages,
                 }
               : null
           }

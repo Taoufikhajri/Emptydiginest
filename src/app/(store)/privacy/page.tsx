@@ -1,21 +1,25 @@
 import type { Metadata } from "next";
 import { ContentPage } from "@/components/store/content-page";
+import { getI18n } from "@/lib/i18n/server";
 import { getSettings } from "@/lib/settings";
 
-export const metadata: Metadata = { title: "Privacy policy" };
+export async function generateMetadata(): Promise<Metadata> {
+  const { t } = await getI18n();
+  return { title: t("privacy.title") };
+}
 
-// Placeholder text: replace with a privacy policy reviewed for your business and country.
+// Placeholder text: replace with a privacy policy reviewed for your business and country (in lib/i18n/messages).
 export default async function PrivacyPage() {
-  const { storeName, supportEmail } = await getSettings();
+  const [{ storeName, supportEmail }, { t }] = await Promise.all([getSettings(), getI18n()]);
   return (
     <ContentPage
-      title="Privacy policy"
-      intro={`How ${storeName} handles your data. Replace this placeholder text with your own policy.`}
+      title={t("privacy.title")}
+      intro={t("privacy.intro", { store: storeName })}
       sections={[
-        { heading: "What we store", body: "Your name, email address, a securely hashed password, and the orders you place." },
-        { heading: "Payments", body: "Payments happen on the payment provider's site. We never see or store your wallet keys or card details." },
-        { heading: "Cookies", body: "We use one cookie to keep you signed in and your browser's storage to remember your cart." },
-        { heading: "Your rights", body: `To see or delete your data, email ${supportEmail}.` },
+        { heading: t("privacy.stored"), body: t("privacy.storedBody") },
+        { heading: t("privacy.payments"), body: t("privacy.paymentsBody") },
+        { heading: t("privacy.cookies"), body: t("privacy.cookiesBody") },
+        { heading: t("privacy.rights"), body: t("privacy.rightsBody", { email: supportEmail }) },
       ]}
     />
   );

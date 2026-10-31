@@ -6,6 +6,7 @@ import { ProductGrid } from "@/components/store/product-card";
 import { ProductPurchase } from "@/components/store/product-purchase";
 import { ProductVisual } from "@/components/product-visual";
 import { formatShopPrice } from "@/lib/currency";
+import { getI18n } from "@/lib/i18n/server";
 import { discountPercent } from "@/lib/money";
 import { getProductBySlug, getRelatedProducts } from "@/lib/queries";
 import { getPricing } from "@/lib/pricing";
@@ -14,27 +15,27 @@ type Props = { params: Promise<{ slug: string }> };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const product = await getProductBySlug((await params).slug);
-  return product ? { title: product.name, description: product.description } : { title: "Product not found" };
+  return product ? { title: product.name, description: product.description } : { title: (await getI18n()).t("product.notFound") };
 }
 
 const promises = [
-  { icon: Zap, text: "Delivered automatically once payment is confirmed" },
-  { icon: Mail, text: "Details on your order page and by email" },
-  { icon: ShieldCheck, text: "Replaced or refunded if it doesn't work" },
-];
+  { icon: Zap, key: "product.promiseDelivery" },
+  { icon: Mail, key: "product.promiseDetails" },
+  { icon: ShieldCheck, key: "product.promiseGuarantee" },
+] as const;
 
 export default async function ProductPage({ params }: Props) {
   const product = await getProductBySlug((await params).slug);
   if (!product) notFound();
 
-  const [related, pricing] = await Promise.all([getRelatedProducts(product), getPricing()]);
+  const [related, pricing, { t }] = await Promise.all([getRelatedProducts(product), getPricing(), getI18n()]);
   const discount = discountPercent(product.priceCents, product.compareAtCents);
 
   return (
     <div className="mx-auto max-w-7xl px-4 pt-10 pb-20 sm:px-6 lg:px-8">
       <nav aria-label="Breadcrumb" className="text-xs text-muted-foreground">
         <Link href="/" className="hover:text-foreground">
-          Home
+          {t("catalog.home")}
         </Link>
         <span className="mx-1.5">/</span>
         {product.categorySlug ? (
@@ -43,7 +44,7 @@ export default async function ProductPage({ params }: Props) {
           </Link>
         ) : (
           <Link href="/products" className="hover:text-foreground">
-            Products
+            {t("product.products")}
           </Link>
         )}
         <span className="mx-1.5">/</span>
@@ -72,7 +73,7 @@ export default async function ProductPage({ params }: Props) {
           )}
           <h1 className="mt-3 text-2xl leading-tight font-semibold tracking-[-0.03em] sm:text-3xl">{product.name}</h1>
           {product.buyersThisMonth > 0 && (
-            <p className="mt-2 text-sm text-muted-foreground">{product.buyersThisMonth} buyers this month</p>
+            <p className="mt-2 text-sm text-muted-foreground">{t("product.buyers", { count: product.buyersThisMonth })}</p>
           )}
 
           <div className="mt-5 flex flex-wrap items-baseline gap-3">
@@ -81,7 +82,7 @@ export default async function ProductPage({ params }: Props) {
               <>
                 <span className="text-muted-foreground tabular-nums line-through">{formatShopPrice(product.compareAtCents, pricing)}</span>
                 <span className="rounded bg-signal-emerald/10 px-2 py-0.5 text-xs font-semibold text-signal-emerald">
-                  {discount}% off
+                  {t("product.off", { percent: discount })}
                 </span>
               </>
             )}
@@ -102,10 +103,10 @@ export default async function ProductPage({ params }: Props) {
           </div>
 
           <ul className="mt-6 space-y-2.5 border-t border-border/70 pt-5 text-sm text-muted-foreground">
-            {promises.map(({ icon: PromiseIcon, text }) => (
-              <li key={text} className="flex items-center gap-2.5">
+            {promises.map(({ icon: PromiseIcon, key }) => (
+              <li key={key} className="flex items-center gap-2.5">
                 <PromiseIcon className="size-4 shrink-0 text-primary" />
-                {text}
+                {t(key)}
               </li>
             ))}
           </ul>
@@ -114,14 +115,14 @@ export default async function ProductPage({ params }: Props) {
 
       <div className="mt-6 grid gap-6 lg:grid-cols-[1.1fr_1fr] lg:gap-10">
         <section className="rounded-(--store-radius) bg-card p-6 shadow-[0_4px_6px_-1px_rgba(0,0,0,0.08)] sm:p-8">
-          <h2 className="font-semibold">About this product</h2>
+          <h2 className="font-semibold">{t("product.about")}</h2>
           <p className="mt-3 text-sm leading-relaxed whitespace-pre-line text-muted-foreground">
-            {product.description || "No description yet."}
+            {product.description || t("product.noDescription")}
           </p>
         </section>
         {product.features.length > 0 && (
           <section className="rounded-(--store-radius) bg-card p-6 shadow-[0_4px_6px_-1px_rgba(0,0,0,0.08)] sm:p-8">
-            <h2 className="font-semibold">What&apos;s included</h2>
+            <h2 className="font-semibold">{t("product.included")}</h2>
             <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
               {product.features.map((feature) => (
                 <li key={feature} className="flex items-center gap-2">
@@ -137,7 +138,7 @@ export default async function ProductPage({ params }: Props) {
       {related.length > 0 && (
         <section className="mt-14">
           <h2 className="text-lg font-semibold tracking-[-0.045em]">
-            More in {product.categoryName ?? "the store"}
+            {product.categoryName ? t("product.moreIn", { category: product.categoryName }) : t("product.moreFromStore")}
           </h2>
           <div className="mt-4">
             <ProductGrid products={related} pricing={pricing} />

@@ -4,10 +4,12 @@ import Link from "next/link";
 import { ArrowRight, Minus, Plus, ShoppingBag, Trash2 } from "lucide-react";
 import { ProductVisual } from "@/components/product-visual";
 import { formatMoney, formatShopPrice } from "@/lib/currency";
+import { useI18n } from "@/components/i18n-provider";
 import { useCart } from "./cart-provider";
 
 export function CartView({ signedIn }: { signedIn: boolean }) {
   const { items, ready, totalCents, pricing, setQuantity, remove } = useCart();
+  const { t } = useI18n();
 
   if (!ready) {
     return <div className="h-60 animate-pulse rounded-(--store-radius) bg-card" />;
@@ -17,13 +19,13 @@ export function CartView({ signedIn }: { signedIn: boolean }) {
     return (
       <div className="rounded-(--store-radius) bg-card px-6 py-16 text-center">
         <ShoppingBag className="mx-auto size-10 text-muted-foreground" />
-        <p className="mt-3 font-semibold">Your cart is empty</p>
+        <p className="mt-3 font-semibold">{t("cart.empty")}</p>
         <Link
           href="/products"
           className="mt-5 inline-flex h-11 items-center gap-2 rounded-full bg-primary px-6 text-sm font-semibold text-primary-foreground hover:opacity-90"
         >
-          Browse the catalog
-          <ArrowRight className="size-4" />
+          {t("cart.browse")}
+          <ArrowRight className="size-4 rtl:-scale-x-100" />
         </Link>
       </div>
     );
@@ -42,12 +44,12 @@ export function CartView({ signedIn }: { signedIn: boolean }) {
                 <Link href={`/products/${item.slug}`} className="line-clamp-2 text-sm font-semibold hover:text-primary">
                   {item.name}
                 </Link>
-                <p className="mt-0.5 text-xs text-muted-foreground tabular-nums">{formatShopPrice(item.priceCents, pricing)} each</p>
+                <p className="mt-0.5 text-xs text-muted-foreground tabular-nums">{t("cart.each", { price: formatShopPrice(item.priceCents, pricing) })}</p>
               </div>
               <div className="inline-flex items-center rounded-full border border-border">
                 <button
                   type="button"
-                  aria-label={`Decrease quantity of ${item.name}`}
+                  aria-label={t("cart.decrease", { name: item.name })}
                   onClick={() => setQuantity(item.productId, item.quantity - 1)}
                   className="grid size-8 place-items-center rounded-full hover:bg-secondary"
                 >
@@ -56,7 +58,7 @@ export function CartView({ signedIn }: { signedIn: boolean }) {
                 <span className="w-7 text-center text-sm font-semibold tabular-nums">{item.quantity}</span>
                 <button
                   type="button"
-                  aria-label={`Increase quantity of ${item.name}`}
+                  aria-label={t("cart.increase", { name: item.name })}
                   onClick={() => setQuantity(item.productId, item.quantity + 1)}
                   disabled={item.quantity >= 20}
                   className="grid size-8 place-items-center rounded-full hover:bg-secondary disabled:opacity-40"
@@ -69,7 +71,7 @@ export function CartView({ signedIn }: { signedIn: boolean }) {
               </span>
               <button
                 type="button"
-                aria-label={`Remove ${item.name}`}
+                aria-label={t("cart.remove", { name: item.name })}
                 onClick={() => remove(item.productId)}
                 className="grid size-8 place-items-center rounded-full text-muted-foreground hover:bg-secondary hover:text-destructive"
               >
@@ -81,19 +83,19 @@ export function CartView({ signedIn }: { signedIn: boolean }) {
       </ul>
 
       <aside className="h-fit rounded-(--store-radius) bg-card p-6 lg:sticky lg:top-20">
-        <h2 className="font-semibold">Summary</h2>
+        <h2 className="font-semibold">{t("cart.summary")}</h2>
         <dl className="mt-4 space-y-2 text-sm">
           <div className="flex justify-between">
-            <dt className="text-muted-foreground">Subtotal</dt>
+            <dt className="text-muted-foreground">{t("cart.subtotal")}</dt>
             <dd className="tabular-nums">{formatShopPrice(totalCents, pricing)}</dd>
           </div>
           <div className="flex justify-between border-t border-border/70 pt-2 text-base font-semibold">
-            <dt>Total</dt>
+            <dt>{t("cart.total")}</dt>
             <dd className="tabular-nums">{formatShopPrice(totalCents, pricing)}</dd>
           </div>
           {pricing.display !== pricing.store && (
             <p className="text-xs text-muted-foreground">
-              Approximate. You&apos;ll be charged {formatMoney(totalCents, pricing.store)} ({pricing.store}).
+              {t("cart.approximate", { amount: formatMoney(totalCents, pricing.store, pricing.intl), currency: pricing.store })}
             </p>
           )}
         </dl>
@@ -101,11 +103,11 @@ export function CartView({ signedIn }: { signedIn: boolean }) {
           href={signedIn ? "/checkout" : "/login?next=/checkout"}
           className="mt-5 flex h-12 items-center justify-center gap-2 rounded-full bg-primary font-semibold text-primary-foreground hover:opacity-90"
         >
-          {signedIn ? "Checkout" : "Sign in to checkout"}
-          <ArrowRight className="size-4" />
+          {signedIn ? t("cart.checkout") : t("cart.signInToCheckout")}
+          <ArrowRight className="size-4 rtl:-scale-x-100" />
         </Link>
         <Link href="/products" className="mt-3 block text-center text-sm font-semibold text-muted-foreground hover:text-foreground">
-          Continue shopping
+          {t("cart.continue")}
         </Link>
       </aside>
     </div>

@@ -6,6 +6,7 @@ import { useCallback, useEffect, useState } from "react";
 import { ArrowRight, ChevronLeft, ChevronRight, RotateCcw } from "lucide-react";
 import type { HeroCardStyle } from "@/lib/settings-shared";
 import { cn } from "@/lib/utils";
+import { useI18n } from "@/components/i18n-provider";
 import { useCart, type CartItem } from "./cart-provider";
 
 export type HeroSlide = {
@@ -50,6 +51,7 @@ const stackTransforms = [
 export function Hero({ slides, content }: { slides: HeroSlide[]; content: HeroContent }) {
   const router = useRouter();
   const { add } = useCart();
+  const { t } = useI18n();
   const [active, setActive] = useState(0);
   const [paused, setPaused] = useState(false);
   const [introKey, setIntroKey] = useState(0);
@@ -80,8 +82,8 @@ export function Hero({ slides, content }: { slides: HeroSlide[]; content: HeroCo
               href="/products"
               className="inline-flex items-center justify-center gap-2 rounded-full bg-primary px-6 py-3 font-semibold text-primary-foreground transition-opacity hover:opacity-90 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:outline-none"
             >
-              Browse the catalog
-              <ArrowRight className="size-4" />
+              {t("hero.browse")}
+              <ArrowRight className="size-4 rtl:-scale-x-100" />
             </Link>
             <button
               type="button"
@@ -92,7 +94,7 @@ export function Hero({ slides, content }: { slides: HeroSlide[]; content: HeroCo
               className="inline-flex h-10 items-center gap-1.5 rounded-full px-1.5 text-sm font-semibold text-muted-foreground hover:text-foreground"
             >
               <RotateCcw className="size-4" />
-              Watch the intro again
+              {t("hero.replay")}
             </button>
           </div>
         </div>
@@ -112,7 +114,7 @@ export function Hero({ slides, content }: { slides: HeroSlide[]; content: HeroCo
                   href={slide.href}
                   tabIndex={depth === 0 ? 0 : -1}
                   aria-hidden={depth !== 0}
-                  aria-label={slide.cartItem ? `Add ${slide.cartItem.name} to cart` : undefined}
+                  aria-label={slide.cartItem ? t("product.addNamed", { name: slide.cartItem.name }) : undefined}
                   onClick={(event) => {
                     if (!slide.cartItem) return;
                     event.preventDefault();
@@ -154,18 +156,18 @@ export function Hero({ slides, content }: { slides: HeroSlide[]; content: HeroCo
             <div className="mt-8 flex items-center gap-3">
               <button
                 type="button"
-                aria-label="Previous card"
+                aria-label={t("hero.previous")}
                 onClick={() => go(-1)}
                 className="grid size-8 place-items-center rounded-full bg-card text-foreground shadow-sm hover:bg-secondary"
               >
-                <ChevronLeft className="size-4" />
+                <ChevronLeft className="size-4 rtl:-scale-x-100" />
               </button>
               <div className="flex items-center gap-1.5">
                 {slides.map((slide, index) => (
                   <button
                     key={slide.key}
                     type="button"
-                    aria-label={`Show card ${index + 1}`}
+                    aria-label={t("hero.showCard", { number: index + 1 })}
                     aria-current={index === active}
                     onClick={() => setActive(index)}
                     className={cn(
@@ -177,11 +179,11 @@ export function Hero({ slides, content }: { slides: HeroSlide[]; content: HeroCo
               </div>
               <button
                 type="button"
-                aria-label="Next card"
+                aria-label={t("hero.next")}
                 onClick={() => go(1)}
                 className="grid size-8 place-items-center rounded-full bg-card text-foreground shadow-sm hover:bg-secondary"
               >
-                <ChevronRight className="size-4" />
+                <ChevronRight className="size-4 rtl:-scale-x-100" />
               </button>
             </div>
           )}

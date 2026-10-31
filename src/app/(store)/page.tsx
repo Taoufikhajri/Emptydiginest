@@ -5,6 +5,7 @@ import { Guarantee } from "@/components/store/guarantee";
 import { Hero, type HeroSlide } from "@/components/store/hero";
 import { ProductGrid } from "@/components/store/product-card";
 import { formatShopPrice } from "@/lib/currency";
+import { getI18n } from "@/lib/i18n/server";
 import { getPricing } from "@/lib/pricing";
 import { getCategories, getProducts } from "@/lib/queries";
 import { getSettings } from "@/lib/settings";
@@ -16,7 +17,7 @@ export default async function HomePage() {
     getProducts(),
     getSettings(),
   ]);
-  const pricing = await getPricing();
+  const [pricing, { t }] = await Promise.all([getPricing(), getI18n()]);
   const { sections } = settings;
   const showcase = featured.length > 0 ? featured : all.slice(0, 8);
 
@@ -25,8 +26,8 @@ export default async function HomePage() {
     const product = card.productId ? all.find((item) => item.id === card.productId) : null;
     if (card.productId && !product) return [];
     if (!product) {
-      const title = card.title || "Browse the catalog";
-      return [{ key: `card-${index}`, label: card.label, title, detail: card.detail || "All products", largeDetail: false, href: "/products" }];
+      const title = card.title || t("hero.browse");
+      return [{ key: `card-${index}`, label: card.label, title, detail: card.detail || t("nav.allProducts"), largeDetail: false, href: "/products" }];
     }
     return [
       {
@@ -59,8 +60,8 @@ export default async function HomePage() {
           {
             key: "intro",
             label: "",
-            title: `${all.length} tools for makers and creators`,
-            detail: "Delivered automatically",
+            title: t("hero.introTitle", { count: all.length }),
+            detail: t("hero.introDetail"),
             largeDetail: false,
             href: "/products",
           },
@@ -95,11 +96,11 @@ export default async function HomePage() {
         <section className="mx-auto max-w-7xl px-4 pt-14 pb-20 sm:px-6 lg:px-8">
           <div className="flex items-end justify-between gap-4">
             <h2 className="text-lg font-semibold tracking-[-0.045em] text-foreground">
-              {sections.popular ? "Popular right now" : "Browse by category"}
+              {sections.popular ? t("home.popular") : t("home.byCategory")}
             </h2>
             <Link href="/products" className="inline-flex items-center gap-1 text-sm font-semibold text-primary hover:underline">
-              View all
-              <ArrowRight className="size-4" />
+              {t("home.viewAll")}
+              <ArrowRight className="size-4 rtl:-scale-x-100" />
             </Link>
           </div>
           {sections.categories && (
@@ -113,7 +114,7 @@ export default async function HomePage() {
                 <ProductGrid products={showcase} pricing={pricing} />
               ) : (
                 <p className="rounded-(--store-radius) bg-card px-6 py-14 text-center text-muted-foreground">
-                  No products yet. Add some from the admin dashboard.
+                  {t("home.noProducts")}
                 </p>
               )}
             </div>
@@ -123,8 +124,8 @@ export default async function HomePage() {
       {!sections.hero && !sections.guarantee && !sections.categories && !sections.popular && (
         <section className="mx-auto max-w-7xl px-4 py-24 text-center sm:px-6 lg:px-8">
           <Link href="/products" className="inline-flex items-center gap-1.5 font-semibold text-primary hover:underline">
-            Browse all products
-            <ArrowRight className="size-4" />
+            {t("home.browseAll")}
+            <ArrowRight className="size-4 rtl:-scale-x-100" />
           </Link>
         </section>
       )}

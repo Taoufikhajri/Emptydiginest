@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { CatalogView } from "@/components/store/catalog-view";
+import { getI18n } from "@/lib/i18n/server";
 import { getCategories, getCategoryBySlug, getProducts } from "@/lib/queries";
 
 type Props = {
@@ -10,7 +11,7 @@ type Props = {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const category = await getCategoryBySlug((await params).slug);
-  return { title: category?.name ?? "Category not found" };
+  return { title: category?.name ?? (await getI18n()).t("catalog.categoryNotFound") };
 }
 
 export default async function CategoryPage({ params, searchParams }: Props) {

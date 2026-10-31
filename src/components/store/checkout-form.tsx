@@ -7,12 +7,14 @@ import { placeOrder } from "@/app/actions/checkout";
 import { ProductVisual } from "@/components/product-visual";
 import { formatMoney, formatShopPrice } from "@/lib/currency";
 import { cn } from "@/lib/utils";
+import { useI18n } from "@/components/i18n-provider";
 import { useCart } from "./cart-provider";
 
 export type CheckoutProvider = { id: string; label: string; description: string; demo: boolean };
 
 export function CheckoutForm({ providers, email }: { providers: CheckoutProvider[]; email: string }) {
   const { items, ready, totalCents, pricing } = useCart();
+  const { t } = useI18n();
   const [state, action, pending] = useActionState(placeOrder, undefined);
   const [provider, setProvider] = useState(providers[0]?.id ?? "");
 
@@ -21,9 +23,9 @@ export function CheckoutForm({ providers, email }: { providers: CheckoutProvider
   if (items.length === 0) {
     return (
       <div className="rounded-(--store-radius) bg-card px-6 py-14 text-center">
-        <p className="font-semibold">Your cart is empty</p>
+        <p className="font-semibold">{t("cart.empty")}</p>
         <Link href="/products" className="mt-3 inline-block text-sm font-semibold text-primary hover:underline">
-          Browse the catalog
+          {t("cart.browse")}
         </Link>
       </div>
     );
@@ -36,17 +38,17 @@ export function CheckoutForm({ providers, email }: { providers: CheckoutProvider
       <input type="hidden" name="cart" value={cart} />
       <div className="space-y-6">
         <section className="rounded-(--store-radius) bg-card p-6">
-          <h2 className="font-semibold">Delivery</h2>
+          <h2 className="font-semibold">{t("checkout.delivery")}</h2>
           <p className="mt-2 text-sm text-muted-foreground">
-            Your order details will be on the order page and sent to <span className="font-medium text-foreground">{email}</span>.
+            {t("checkout.deliveryBody", { email })}
           </p>
         </section>
 
         <fieldset className="rounded-(--store-radius) bg-card p-6">
-          <legend className="sr-only">Payment method</legend>
-          <h2 className="font-semibold">Payment method</h2>
+          <legend className="sr-only">{t("checkout.paymentMethod")}</legend>
+          <h2 className="font-semibold">{t("checkout.paymentMethod")}</h2>
           {providers.length === 0 ? (
-            <p className="mt-3 text-sm text-destructive">No payment method is set up yet. Please contact support.</p>
+            <p className="mt-3 text-sm text-destructive">{t("checkout.noProviders")}</p>
           ) : (
             <div className="mt-4 grid gap-3">
               {providers.map((option) => (
@@ -70,7 +72,7 @@ export function CheckoutForm({ providers, email }: { providers: CheckoutProvider
                       {option.label}
                       {option.demo && (
                         <span className="rounded bg-amber-100 px-1.5 py-0.5 text-[10px] font-semibold text-amber-800">
-                          Demo mode
+                          {t("checkout.demo")}
                         </span>
                       )}
                     </span>
@@ -84,7 +86,7 @@ export function CheckoutForm({ providers, email }: { providers: CheckoutProvider
       </div>
 
       <aside className="h-fit rounded-(--store-radius) bg-card p-6 lg:sticky lg:top-20">
-        <h2 className="font-semibold">Order summary</h2>
+        <h2 className="font-semibold">{t("checkout.summary")}</h2>
         <ul className="mt-4 space-y-3">
           {items.map((item) => {
             return (
@@ -101,13 +103,13 @@ export function CheckoutForm({ providers, email }: { providers: CheckoutProvider
           })}
         </ul>
         <div className="mt-4 flex justify-between border-t border-border/70 pt-3 font-semibold">
-          <span>Total</span>
+          <span>{t("checkout.total")}</span>
           <span className="tabular-nums">{formatShopPrice(totalCents, pricing)}</span>
         </div>
         {pricing.display !== pricing.store && (
           <div className="mt-2 flex justify-between rounded-xl bg-secondary px-3 py-2 text-sm">
-            <span>You&apos;ll be charged</span>
-            <span className="font-semibold tabular-nums">{formatMoney(totalCents, pricing.store)}</span>
+            <span>{t("checkout.charged")}</span>
+            <span className="font-semibold tabular-nums">{formatMoney(totalCents, pricing.store, pricing.intl)}</span>
           </div>
         )}
         {state?.error && (
@@ -121,10 +123,10 @@ export function CheckoutForm({ providers, email }: { providers: CheckoutProvider
           className="mt-5 flex h-12 w-full items-center justify-center gap-2 rounded-full bg-primary font-semibold text-primary-foreground hover:opacity-90 disabled:opacity-60"
         >
           {pending ? <Loader2 className="size-4 animate-spin" /> : <Lock className="size-4" />}
-          {pending ? "Creating your order..." : "Place order and pay"}
+          {pending ? t("checkout.placing") : t("checkout.place")}
         </button>
         <p className="mt-3 text-center text-xs text-muted-foreground">
-          Final prices are confirmed on the server when you place the order.
+          {t("checkout.serverNote")}
         </p>
       </aside>
     </form>

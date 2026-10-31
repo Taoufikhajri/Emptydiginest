@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getI18n } from "@/lib/i18n/server";
 import type { Category } from "@/lib/queries";
 import { cn } from "@/lib/utils";
 
@@ -8,9 +9,10 @@ type CategoryChipsProps = {
   totalCount: number;
 };
 
-export function CategoryChips({ categories, activeSlug, totalCount }: CategoryChipsProps) {
+export async function CategoryChips({ categories, activeSlug, totalCount }: CategoryChipsProps) {
+  const { t } = await getI18n();
   const chips = [
-    { slug: undefined, href: "/products", label: "All", count: totalCount },
+    { slug: undefined, href: "/products", label: t("catalog.all"), count: totalCount },
     ...categories.map((category) => ({
       slug: category.slug,
       href: `/categories/${category.slug}`,
@@ -20,7 +22,7 @@ export function CategoryChips({ categories, activeSlug, totalCount }: CategoryCh
   ];
 
   return (
-    <nav aria-label="Categories" className="no-scrollbar -mx-4 flex gap-2 overflow-x-auto px-4 sm:mx-0 sm:flex-wrap sm:px-0">
+    <nav aria-label={t("catalog.categories")} className="no-scrollbar -mx-4 flex gap-2 overflow-x-auto px-4 sm:mx-0 sm:flex-wrap sm:px-0">
       {chips.map((chip) => {
         const selected = chip.slug === activeSlug;
         return (

@@ -19,18 +19,19 @@ export const ratesPerEur: Record<CurrencyCode, number> = {
 const isCurrency = (value: string | null | undefined): value is CurrencyCode =>
   Boolean(value && value in ratesPerEur);
 
-// Prices are stored and charged in the store currency; visitors may see them converted to their own.
-export type Pricing = { store: CurrencyCode; display: CurrencyCode };
+// Prices are stored and charged in the store currency; visitors may see them converted to their own,
+// formatted for their language (intl is a BCP 47 locale such as "fr-FR").
+export type Pricing = { store: CurrencyCode; display: CurrencyCode; intl: string };
 
 export const convertCents = (cents: number, from: CurrencyCode, to: CurrencyCode) =>
   from === to ? cents : Math.round((cents / ratesPerEur[from]) * ratesPerEur[to]);
 
-export const formatMoney = (cents: number, currency: string) =>
-  new Intl.NumberFormat("en-IE", { style: "currency", currency }).format(cents / 100);
+export const formatMoney = (cents: number, currency: string, intl = "en-IE") =>
+  new Intl.NumberFormat(intl, { style: "currency", currency }).format(cents / 100);
 
 // A store price shown in the visitor's currency.
 export const formatShopPrice = (cents: number, pricing: Pricing) =>
-  formatMoney(convertCents(cents, pricing.store, pricing.display), pricing.display);
+  formatMoney(convertCents(cents, pricing.store, pricing.display), pricing.display, pricing.intl);
 
 const euroCountries = [
   "AT", "BE", "CY", "DE", "EE", "ES", "FI", "FR", "GR", "HR", "IE", "IT", "LT", "LU", "LV", "MT", "NL", "PT", "SI", "SK",

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getI18n } from "@/lib/i18n/server";
 import { BrandMark } from "./brand-mark";
 import type { StoreBrand } from "./site-header";
 
@@ -11,20 +12,21 @@ type SiteFooterProps = {
   categories: { slug: string; name: string }[];
 };
 
-export function SiteFooter({ brand, description, supportEmail, categories }: SiteFooterProps) {
+export async function SiteFooter({ brand, description, supportEmail, categories }: SiteFooterProps) {
+  const { t } = await getI18n();
   const browse: FooterLink[] = [
-    { label: "All products", href: "/products" },
+    { label: t("nav.allProducts"), href: "/products" },
     ...categories.map((category) => ({ label: category.name, href: `/categories/${category.slug}` })),
   ];
   const legal: FooterLink[] = [
-    { label: "Terms of service", href: "/terms" },
-    { label: "Privacy policy", href: "/privacy" },
-    { label: "Guarantee & refunds", href: "/guarantee" },
+    { label: t("footer.terms"), href: "/terms" },
+    { label: t("footer.privacy"), href: "/privacy" },
+    { label: t("footer.guarantee"), href: "/guarantee" },
   ];
   const help: FooterLink[] = [
-    { label: "My orders", href: "/account" },
-    { label: "Cart", href: "/cart" },
-    ...(supportEmail ? [{ label: "Contact", href: `mailto:${supportEmail}` }] : []),
+    { label: t("footer.myOrders"), href: "/account" },
+    { label: t("footer.cart"), href: "/cart" },
+    ...(supportEmail ? [{ label: t("footer.contact"), href: `mailto:${supportEmail}` }] : []),
   ];
 
   return (
@@ -38,12 +40,12 @@ export function SiteFooter({ brand, description, supportEmail, categories }: Sit
             </Link>
             <p className="mt-3 max-w-xs text-sm text-muted-foreground">{description}</p>
           </div>
-          <FooterColumn title="Browse" links={browse} />
-          <FooterColumn title="Legal" links={legal} />
-          <FooterColumn title="Help" links={help} />
+          <FooterColumn title={t("footer.browse")} links={browse} />
+          <FooterColumn title={t("footer.legal")} links={legal} />
+          <FooterColumn title={t("footer.help")} links={help} />
         </div>
         <p className="mt-12 text-xs text-muted-foreground">
-          © {new Date().getFullYear()} {brand.name}. All rights reserved.
+          {t("footer.rights", { year: new Date().getFullYear(), name: brand.name })}
         </p>
       </div>
     </footer>

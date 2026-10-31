@@ -15,6 +15,7 @@ import {
   providers,
 } from "@/lib/payments";
 import { getOrderByPublicId, toOrder } from "@/lib/queries";
+import { getI18n } from "@/lib/i18n/server";
 import { getStoredSettings } from "@/lib/settings";
 import { getBaseUrl } from "@/lib/url";
 
@@ -22,7 +23,7 @@ export type CheckoutState = { error?: string } | undefined;
 
 const cartSchema = z
   .array(z.object({ productId: z.number().int().positive(), quantity: z.number().int().min(1).max(20) }))
-  .min(1, "Your cart is empty.")
+  .min(1)
   .max(50);
 
 // Read by the cart provider in the browser to empty the cart once an order exists.
@@ -32,20 +33,20 @@ export async function placeOrder(_state: CheckoutState, formData: FormData): Pro
   const user = await getCurrentUser();
   if (!user) redirect("/login?next=/checkout");
 
-  const settings = await getStoredSettings();
+  const [settings, { t }] = await Promise.all([getStoredSettings(), getI18n()]);
   const provider = formData.get("provider");
   if (!isProviderId(provider) || !isProviderAvailable(provider, settings)) {
-    return { error: "Choose an available payment method." };
+    return { error: t("checkout.errProvider") };
   }
 
   let rawCart: unknown;
   try {
     rawCart = JSON.parse(String(formData.get("cart") ?? "[]"));
   } catch {
-    return { error: "Your cart couldn't be read. Refresh the page and try again." };
+    return { error: t("checkout.errCart") };
   }
   const parsed = cartSchema.safeParse(rawCart);
-  if (!parsed.success) return { error: parsed.error.issues[0].message };
+  if (!parsed.success) return { error: Array.isArray(rawCart) && rawCart.length === 0 ? t("checkout.errEmpty") : t("checkout.errCart") };
 
   // Prices always come from the database, never from the browser.
   const ids = parsed.data.map((item) => item.productId);
@@ -60,7 +61,7 @@ export async function placeOrder(_state: CheckoutState, formData: FormData): Pro
       : [];
   });
   if (items.length !== parsed.data.length) {
-    return { error: "Some items in your cart are no longer available. Review your cart and try again." };
+    return { error: t("checkout.errUnavailable") };
   }
   const totalCents = items.reduce((sum, item) => sum + item.unitPriceCents * item.quantity, 0);
 

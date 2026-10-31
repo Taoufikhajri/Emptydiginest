@@ -1,9 +1,12 @@
 import type { Metadata } from "next";
+import { I18nProvider } from "@/components/i18n-provider";
 import { StoreTheme } from "@/components/store-theme";
 import { CartProvider } from "@/components/store/cart-provider";
 import { SiteFooter } from "@/components/store/site-footer";
 import { SiteHeader } from "@/components/store/site-header";
 import { getCurrentUser } from "@/lib/auth";
+import { locales } from "@/lib/i18n/locales";
+import { getI18n } from "@/lib/i18n/server";
 import { getCategories } from "@/lib/queries";
 import { currencies } from "@/lib/settings-shared";
 import { getPricing } from "@/lib/pricing";
@@ -22,13 +25,22 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function StoreLayout({ children }: { children: React.ReactNode }) {
-  const [categories, user, settings, pricing] = await Promise.all([getCategories(), getCurrentUser(), getSettings(), getPricing()]);
+  const [categories, user, settings, pricing, i18n] = await Promise.all([
+    getCategories(),
+    getCurrentUser(),
+    getSettings(),
+    getPricing(),
+    getI18n(),
+  ]);
   const navCategories = categories.map(({ slug, name }) => ({ slug, name }));
   const brand = { name: settings.storeName, logoUrl: settings.logoUrl, showName: settings.showNameWithLogo || !settings.logoUrl };
 
   return (
+    <I18nProvider locale={i18n.locale} messages={i18n.messages}>
     <CartProvider pricing={pricing}>
       <StoreTheme settings={settings} />
+      {/* The admin stays English and left-to-right; only the store follows the visitor's language. */}
+      <div lang={i18n.locale} dir={i18n.info.dir} className="flex flex-1 flex-col">
       {settings.announcement && (
         <div className="bg-primary px-4 py-2 text-center text-sm font-medium text-primary-foreground">{settings.announcement}</div>
       )}
@@ -36,6 +48,7 @@ export default async function StoreLayout({ children }: { children: React.ReactN
       <SiteHeader
         brand={brand}
         currencyOptions={settings.localCurrency ? currencies.map((option) => option.code) : null}
+        languageOptions={locales.map(({ code, label }) => ({ code, label }))}
         categories={navCategories} user={user && { name: user.name, role: user.role }} />
       <main className="flex-1">{children}</main>
       <SiteFooter
@@ -44,6 +57,8 @@ export default async function StoreLayout({ children }: { children: React.ReactN
         supportEmail={settings.supportEmail}
         categories={navCategories}
       />
+      </div>
     </CartProvider>
+    </I18nProvider>
   );
 }

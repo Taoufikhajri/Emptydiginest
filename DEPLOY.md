@@ -71,6 +71,9 @@ A payment method only appears at checkout once its keys are set, unless demo pay
 - In **Admin → Settings**, set your store name, support email, logo, currency and colors.
 - Replace the placeholder products and the terms, privacy and guarantee text.
 - Changing the currency doesn't convert product prices: update them in **Admin → Products** afterwards.
+- The store's own text comes in English, French, Arabic, Spanish and German (`src/lib/i18n/messages`), picked from
+  the visitor's choice, country or browser language. Product names, descriptions and the text you enter in Settings
+  are shown as you write them.
 - Test each provider with sandbox or small real payments. The Binance Pay request format follows its v3 API docs
   and should be checked against your merchant account before launch.
 - Customers aren't emailed automatically yet. Delivery details appear on the order page.

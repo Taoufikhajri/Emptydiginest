@@ -118,8 +118,9 @@ export function SiteHeader({ brand, currencyOptions, languageOptions, categories
         className="h-9 cursor-pointer appearance-none rounded-full border border-border bg-card ps-7 pe-7 text-xs font-semibold text-foreground hover:bg-secondary focus:border-primary focus:outline-none"
       >
         {languageOptions.map((option) => (
-          <option key={option.code} value={option.code}>
-            {option.label}
+          // Short codes keep the header compact; the native name shows on hover.
+          <option key={option.code} value={option.code} title={option.label}>
+            {option.code.toUpperCase()}
           </option>
         ))}
       </select>
@@ -178,7 +179,7 @@ export function SiteHeader({ brand, currencyOptions, languageOptions, categories
               type="button"
               aria-expanded={browseOpen}
               onClick={() => setBrowseOpen((open) => !open)}
-              className="inline-flex h-9 items-center gap-1 rounded-full px-3 hover:bg-secondary hover:text-foreground"
+              className="inline-flex h-9 shrink-0 items-center whitespace-nowrap gap-1 rounded-full px-3 hover:bg-secondary hover:text-foreground"
             >
               {t("nav.browse")}
               <ChevronDown className={cn("size-4 transition-transform", browseOpen && "rotate-180")} />
@@ -200,15 +201,15 @@ export function SiteHeader({ brand, currencyOptions, languageOptions, categories
               </div>
             )}
           </div>
-          <Link href="/products" className="inline-flex h-9 items-center rounded-full px-3 hover:bg-secondary hover:text-foreground">
+          <Link href="/products" className="inline-flex h-9 shrink-0 items-center whitespace-nowrap rounded-full px-3 hover:bg-secondary hover:text-foreground">
             {t("nav.allProducts")}
           </Link>
-          <Link href="/guarantee" className="inline-flex h-9 items-center rounded-full px-3 hover:bg-secondary hover:text-foreground">
+          <Link href="/guarantee" className="hidden h-9 shrink-0 items-center whitespace-nowrap rounded-full px-3 hover:bg-secondary hover:text-foreground xl:inline-flex">
             {t("nav.guarantee")}
           </Link>
         </nav>
 
-        {searchForm("mx-auto hidden w-full max-w-[400px] lg:block")}
+        {searchForm("mx-auto hidden w-full min-w-0 max-w-[400px] lg:block")}
 
         <div className="ms-auto flex items-center gap-1 lg:ms-0 lg:gap-2">
           <button
@@ -227,7 +228,7 @@ export function SiteHeader({ brand, currencyOptions, languageOptions, categories
               {user.role === "admin" && (
                 <Link
                   href="/admin"
-                  className="inline-flex h-9 items-center gap-1.5 rounded-full border border-border px-3 text-xs font-semibold hover:bg-secondary"
+                  className="inline-flex h-9 shrink-0 items-center whitespace-nowrap gap-1.5 rounded-full border border-border px-3 text-xs font-semibold hover:bg-secondary"
                 >
                   <LayoutDashboard className="size-4" />
                   {t("nav.admin")}
@@ -235,7 +236,7 @@ export function SiteHeader({ brand, currencyOptions, languageOptions, categories
               )}
               <Link
                 href="/account"
-                className="inline-flex h-9 items-center gap-1.5 rounded-full bg-foreground px-3.5 text-sm font-semibold text-background"
+                className="inline-flex h-9 shrink-0 items-center whitespace-nowrap gap-1.5 rounded-full bg-foreground px-3.5 text-sm font-semibold text-background"
               >
                 <User className="size-4" />
                 {user.name.split(" ")[0]}
@@ -244,7 +245,7 @@ export function SiteHeader({ brand, currencyOptions, languageOptions, categories
           ) : (
             <Link
               href="/login"
-              className="hidden h-9 items-center rounded-full bg-foreground px-3.5 text-sm font-semibold text-background lg:inline-flex"
+              className="hidden h-9 shrink-0 items-center whitespace-nowrap rounded-full bg-foreground px-3.5 text-sm font-semibold text-background lg:inline-flex"
             >
               {t("nav.signIn")}
             </Link>

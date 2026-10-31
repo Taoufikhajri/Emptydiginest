@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { CatalogView } from "@/components/store/catalog-view";
+import { getCategoryLocalizer } from "@/lib/i18n/localize";
 import { getI18n } from "@/lib/i18n/server";
 import { getCategories, getCategoryBySlug, getProducts } from "@/lib/queries";
 
@@ -11,7 +12,8 @@ type Props = {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const category = await getCategoryBySlug((await params).slug);
-  return { title: category?.name ?? (await getI18n()).t("catalog.categoryNotFound") };
+  if (!category) return { title: (await getI18n()).t("catalog.categoryNotFound") };
+  return { title: (await getCategoryLocalizer())(category).name };
 }
 
 export default async function CategoryPage({ params, searchParams }: Props) {
@@ -29,7 +31,7 @@ export default async function CategoryPage({ params, searchParams }: Props) {
 
   return (
     <CatalogView
-      title={category.name}
+      title={(await getCategoryLocalizer())(category).name}
       categories={categories}
       products={products}
       totalCount={all.length}

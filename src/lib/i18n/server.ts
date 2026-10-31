@@ -8,7 +8,7 @@ import { es } from "./messages/es";
 import { fr } from "./messages/fr";
 import { createTranslate } from "./translate";
 
-const dictionaries: Record<Locale, Messages> = { en, fr, ar, es, de };
+export const dictionaries: Record<Locale, Messages> = { en, fr, ar, es, de };
 
 // The visitor's language for this request: their choice (cookie), then their country when the host
 // sends one (Vercel, Cloudflare; Railway doesn't), then their browser languages.

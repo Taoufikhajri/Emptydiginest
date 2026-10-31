@@ -9,6 +9,7 @@ import { iconNames } from "@/lib/icons";
 import { checkImageUpload, readImageUpload } from "@/lib/images";
 import { parsePriceToCents } from "@/lib/money";
 import { orderStatuses } from "@/lib/queries";
+import { translationLocales } from "@/lib/settings-shared";
 
 export type AdminFormState = { error?: string; saved?: boolean } | undefined;
 
@@ -97,6 +98,28 @@ export async function saveProduct(_state: AdminFormState, formData: FormData): P
       values,
     );
     productId = created?.id ?? null;
+  }
+
+  // Translations: inputs named tr-<locale>-<field>; a language with every field empty is removed.
+  if (productId) {
+    for (const { code } of translationLocales) {
+      const name = String(formData.get(`tr-${code}-name`) ?? "").trim().slice(0, 160);
+      const description = String(formData.get(`tr-${code}-description`) ?? "").trim().slice(0, 4000);
+      const trFeatures = String(formData.get(`tr-${code}-features`) ?? "")
+        .split("\n")
+        .map((line) => line.trim())
+        .filter(Boolean)
+        .slice(0, 10);
+      if (!name && !description && trFeatures.length === 0) {
+        await query("DELETE FROM product_translations WHERE product_id = $1 AND locale = $2", [productId, code]);
+      } else {
+        await query(
+          `INSERT INTO product_translations (product_id, locale, name, description, features) VALUES ($1, $2, $3, $4, $5::jsonb)
+           ON CONFLICT (product_id, locale) DO UPDATE SET name = EXCLUDED.name, description = EXCLUDED.description, features = EXCLUDED.features`,
+          [productId, code, name, description, JSON.stringify(trFeatures)],
+        );
+      }
+    }
   }
 
   const image = await readImageUpload(formData.get("image"));

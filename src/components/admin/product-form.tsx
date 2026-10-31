@@ -5,7 +5,10 @@ import { Loader2 } from "lucide-react";
 import { saveProduct } from "@/app/actions/admin";
 import { ProductVisual } from "@/components/product-visual";
 import { iconNames } from "@/lib/icons";
+import { translateDescription, translatePhrase, translateProductName } from "@/lib/i18n/content";
 import { imageAccept } from "@/lib/images";
+import type { TranslationLocale } from "@/lib/settings-shared";
+import { TranslationTabs } from "./translation-tabs";
 import { buttonClass, inputClass } from "./ui";
 
 export type ProductFormValues = {
@@ -23,7 +26,10 @@ export type ProductFormValues = {
   buyersThisMonth: number;
   featured: boolean;
   active: boolean;
+  translations: Partial<Record<TranslationLocale, ProductTranslationValues>>;
 };
+
+export type ProductTranslationValues = { name: string; description: string; features: string };
 
 type ProductFormProps = { values: ProductFormValues; categories: { id: number; name: string }[]; currency: string };
 
@@ -65,6 +71,52 @@ export function ProductForm({ values, categories, currency }: ProductFormProps) 
           Features <span className="font-normal text-muted-foreground">(one per line, up to 10)</span>
           <textarea name="features" rows={4} defaultValue={values.features} className={`${inputClass} h-auto py-2`} />
         </label>
+        <div className="space-y-3 border-t border-border pt-4">
+          <div>
+            <p className="text-sm font-medium">Translations</p>
+            <p className="text-xs text-muted-foreground">
+              Leave a field empty to show the text in grey: a built-in translation or your English text.
+            </p>
+          </div>
+          <TranslationTabs>
+            {(locale) => {
+              const own = values.translations[locale];
+              const autoName = translateProductName(values.name, locale);
+              return (
+                <>
+                  <label className="block text-sm font-medium">
+                    Name
+                    <input name={`tr-${locale}-name`} maxLength={160} defaultValue={own?.name ?? ""} placeholder={autoName} className={inputClass} />
+                  </label>
+                  <label className="block text-sm font-medium">
+                    Description
+                    <textarea
+                      name={`tr-${locale}-description`}
+                      rows={3}
+                      maxLength={4000}
+                      defaultValue={own?.description ?? ""}
+                      placeholder={translateDescription(values.description, values.name, autoName, locale)}
+                      className={`${inputClass} h-auto py-2`}
+                    />
+                  </label>
+                  <label className="block text-sm font-medium">
+                    Features <span className="font-normal text-muted-foreground">(one per line)</span>
+                    <textarea
+                      name={`tr-${locale}-features`}
+                      rows={3}
+                      defaultValue={own?.features ?? ""}
+                      placeholder={values.features
+                        .split("\n")
+                        .map((feature) => translatePhrase(feature.trim(), locale))
+                        .join("\n")}
+                      className={`${inputClass} h-auto py-2`}
+                    />
+                  </label>
+                </>
+              );
+            }}
+          </TranslationTabs>
+        </div>
         <div className="grid gap-4 sm:grid-cols-3">
           <label className="block text-sm font-medium">
             Price ({currency})

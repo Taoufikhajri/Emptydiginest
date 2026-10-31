@@ -12,11 +12,15 @@ import {
   homeSections,
   isHexColor,
   readableTextOn,
+  translatableFields,
   type StoreSettings,
+  type TranslatableField,
+  type TranslationLocale,
 } from "@/lib/settings-shared";
 import { imageAccept } from "@/lib/images";
 import { cn } from "@/lib/utils";
 import { HeroCardsEditor, type HeroCardProduct } from "./hero-cards-editor";
+import { TranslationTabs } from "./translation-tabs";
 import { buttonClass, inputClass, secondaryButtonClass } from "./ui";
 
 type SettingsFormProps = {
@@ -24,11 +28,22 @@ type SettingsFormProps = {
   logoUrl: string | null;
   envBinanceRate: string | null;
   products: HeroCardProduct[];
+  // What each language shows when its translation is left empty (built-in translation or the English text).
+  translationPlaceholders: Record<TranslationLocale, Record<TranslatableField, string>>;
+};
+
+const translationLabels: Record<TranslatableField, string> = {
+  tagline: "Tagline",
+  description: "Short description",
+  announcement: "Announcement bar",
+  heroTitleLead: "Hero headline",
+  heroTitleAccent: "Highlighted part",
+  heroSubtitle: "Hero subtitle",
 };
 
 const checkboxClass = "mt-0.5 size-4 shrink-0 accent-[var(--primary)]";
 
-export function SettingsForm({ values, logoUrl, envBinanceRate, products }: SettingsFormProps) {
+export function SettingsForm({ values, logoUrl, envBinanceRate, products, translationPlaceholders }: SettingsFormProps) {
   const [state, action, pending] = useActionState(updateSettings, undefined);
   const [currency, setCurrency] = useState(values.currency);
   const [primaryColor, setPrimaryColor] = useState(values.primaryColor);
@@ -216,6 +231,28 @@ export function SettingsForm({ values, logoUrl, envBinanceRate, products }: Sett
             <input name="heroSubtitle" maxLength={200} defaultValue={values.heroSubtitle} className={inputClass} />
           </label>
           <HeroCardsEditor initialCards={values.heroCards} products={products} currency={values.currency} storeName={values.storeName} />
+        </Section>
+
+        <Section
+          title="Translations"
+          description="Your texts in each store language. Leave a field empty to show the text in grey: a built-in translation, or your English text."
+        >
+          <TranslationTabs>
+            {(locale) =>
+              translatableFields.map((field) => (
+                <label key={field} className="block text-sm font-medium">
+                  {translationLabels[field]}
+                  <input
+                    name={`tr-${locale}-${field}`}
+                    maxLength={300}
+                    defaultValue={values.translations[locale]?.[field] ?? ""}
+                    placeholder={translationPlaceholders[locale][field]}
+                    className={inputClass}
+                  />
+                </label>
+              ))
+            }
+          </TranslationTabs>
         </Section>
 
         <Section title="Design" description="Colors, font and corner style for the whole store.">

@@ -36,6 +36,11 @@ export const ar: Messages = {
   "hero.showCard": "عرض البطاقة {number}",
   "hero.introTitle": "{count} أداة للمبدعين وصنّاع المحتوى",
   "hero.introDetail": "تسليم تلقائي",
+  "hero.defaultLead": "أدوات للمبدعين،",
+  "hero.defaultAccent": "تصلك فورًا.",
+  "hero.defaultSubtitle": "تصل معظم الطلبات خلال ثوانٍ، في صفحة الطلب وعبر البريد الإلكتروني.",
+  "site.defaultTagline": "أدوات رقمية للمبدعين، تُسلَّم فورًا",
+  "site.defaultDescription": "برامج وقوالب وأدوات إبداعية، تُسلَّم عبر البريد الإلكتروني خلال ثوانٍ.",
 
   "home.popular": "الأكثر رواجًا الآن",
   "home.byCategory": "تصفّح حسب الفئة",

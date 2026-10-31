@@ -5,18 +5,23 @@ import { Guarantee } from "@/components/store/guarantee";
 import { Hero, type HeroSlide } from "@/components/store/hero";
 import { ProductGrid } from "@/components/store/product-card";
 import { formatShopPrice } from "@/lib/currency";
+import { getCategoryLocalizer, getLocalizedSettings, getProductLocalizer } from "@/lib/i18n/localize";
 import { getI18n } from "@/lib/i18n/server";
 import { getPricing } from "@/lib/pricing";
 import { getCategories, getProducts } from "@/lib/queries";
-import { getSettings } from "@/lib/settings";
 
 export default async function HomePage() {
-  const [categories, featured, all, settings] = await Promise.all([
+  const [rawCategories, rawFeatured, rawAll, settings, localizeProduct, localizeCategory] = await Promise.all([
     getCategories(),
     getProducts({ featuredOnly: true, limit: 8 }),
     getProducts(),
-    getSettings(),
+    getLocalizedSettings(),
+    getProductLocalizer(),
+    getCategoryLocalizer(),
   ]);
+  const categories = rawCategories.map(localizeCategory);
+  const featured = rawFeatured.map(localizeProduct);
+  const all = rawAll.map(localizeProduct);
   const [pricing, { t }] = await Promise.all([getPricing(), getI18n()]);
   const { sections } = settings;
   const showcase = featured.length > 0 ? featured : all.slice(0, 8);

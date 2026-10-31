@@ -1,6 +1,6 @@
 // Store settings that admins edit in /admin/settings. Safe to import from client components.
 
-// Two-decimal currencies only: prices are stored in cents.
+// Prices are stored in cents (1/100 of a unit); TND shows its usual 3 decimals but is rounded to 1/100.
 export const currencies = [
   { code: "EUR", label: "Euro (€)" },
   { code: "USD", label: "US dollar ($)" },
@@ -11,6 +11,7 @@ export const currencies = [
   { code: "AED", label: "UAE dirham (AED)" },
   { code: "SAR", label: "Saudi riyal (SAR)" },
   { code: "MAD", label: "Moroccan dirham (MAD)" },
+  { code: "TND", label: "Tunisian dinar (TND)" },
   { code: "TRY", label: "Turkish lira (TRY)" },
 ] as const;
 export type CurrencyCode = (typeof currencies)[number]["code"];
@@ -64,6 +65,18 @@ export const homeSections = [
 ] as const;
 export type HomeSection = (typeof homeSections)[number]["id"];
 
+// Settings text that can be written per language in admin Settings. English is the main text.
+export const translatableFields = ["tagline", "description", "announcement", "heroTitleLead", "heroTitleAccent", "heroSubtitle"] as const;
+export type TranslatableField = (typeof translatableFields)[number];
+export const translationLocales = [
+  { code: "fr", label: "Français" },
+  { code: "ar", label: "العربية" },
+  { code: "es", label: "Español" },
+  { code: "de", label: "Deutsch" },
+] as const;
+export type TranslationLocale = (typeof translationLocales)[number]["code"];
+export type SettingsTranslations = Partial<Record<TranslationLocale, Partial<Record<TranslatableField, string>>>>;
+
 export type StoreSettings = {
   storeName: string;
   tagline: string;
@@ -83,6 +96,8 @@ export type StoreSettings = {
   heroCardStyle: HeroCardStyle;
   // Empty: the hero shows an intro card plus up to 4 featured products.
   heroCards: HeroCard[];
+  // Per-language versions of the translatable fields; empty ones fall back to the English text.
+  translations: SettingsTranslations;
   primaryColor: string;
   backgroundColor: string;
   // Cart count bubble in the header: meant to stand out from the brand color.
@@ -115,6 +130,7 @@ export const defaultSettings: StoreSettings = {
   heroTitleAccent: "delivered instantly.",
   heroSubtitle: "Most orders arrive within seconds, on the order page and by email.",
   heroCards: [],
+  translations: {},
   ...defaultDesign,
 };
 

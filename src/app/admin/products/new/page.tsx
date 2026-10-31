@@ -26,6 +26,7 @@ export default async function NewProductPage() {
           icon: "Package",
           iconColor: "#5433eb",
           imageUrl: null,
+          translations: {},
           price: "",
           compareAt: "",
           features: "",

@@ -1,7 +1,8 @@
 import type { CurrencyCode } from "./settings-shared";
 
 // Fixed exchange rates: units of each currency per 1 EUR, taken on 30 Oct 2026 (ECB reference rates;
-// AED, SAR and MAD from open.er-api.com). They never update by themselves: edit this table to refresh them.
+// AED, SAR and MAD from open.er-api.com; TND from open.er-api.com on 31 Oct 2026).
+// They never update by themselves: edit this table to refresh them.
 export const RATES_DATE = "30 Oct 2026";
 export const ratesPerEur: Record<CurrencyCode, number> = {
   EUR: 1,
@@ -13,6 +14,7 @@ export const ratesPerEur: Record<CurrencyCode, number> = {
   AED: 4.0991,
   SAR: 4.1856,
   MAD: 10.9653,
+  TND: 3.3578,
   TRY: 55.8015,
 };
 
@@ -47,6 +49,7 @@ const countryCurrency: Record<string, CurrencyCode> = {
   AE: "AED",
   SA: "SAR",
   MA: "MAD",
+  TN: "TND",
   TR: "TRY",
 };
 

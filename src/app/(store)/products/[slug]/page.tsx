@@ -6,6 +6,7 @@ import { ProductGrid } from "@/components/store/product-card";
 import { ProductPurchase } from "@/components/store/product-purchase";
 import { ProductVisual } from "@/components/product-visual";
 import { formatShopPrice } from "@/lib/currency";
+import { getProductLocalizer } from "@/lib/i18n/localize";
 import { getI18n } from "@/lib/i18n/server";
 import { discountPercent } from "@/lib/money";
 import { getProductBySlug, getRelatedProducts } from "@/lib/queries";
@@ -14,8 +15,10 @@ import { getPricing } from "@/lib/pricing";
 type Props = { params: Promise<{ slug: string }> };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const product = await getProductBySlug((await params).slug);
-  return product ? { title: product.name, description: product.description } : { title: (await getI18n()).t("product.notFound") };
+  const found = await getProductBySlug((await params).slug);
+  if (!found) return { title: (await getI18n()).t("product.notFound") };
+  const product = (await getProductLocalizer())(found);
+  return { title: product.name, description: product.description };
 }
 
 const promises = [
@@ -25,8 +28,9 @@ const promises = [
 ] as const;
 
 export default async function ProductPage({ params }: Props) {
-  const product = await getProductBySlug((await params).slug);
-  if (!product) notFound();
+  const found = await getProductBySlug((await params).slug);
+  if (!found) notFound();
+  const product = (await getProductLocalizer())(found);
 
   const [related, pricing, { t }] = await Promise.all([getRelatedProducts(product), getPricing(), getI18n()]);
   const discount = discountPercent(product.priceCents, product.compareAtCents);

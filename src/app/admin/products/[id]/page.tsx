@@ -7,7 +7,9 @@ import { ConfirmButton } from "@/components/admin/confirm-button";
 import { ProductForm } from "@/components/admin/product-form";
 import { PageHeader } from "@/components/admin/ui";
 import { getCategories, getProductById } from "@/lib/queries";
+import { query } from "@/lib/db";
 import { getSettings } from "@/lib/settings";
+import type { TranslationLocale } from "@/lib/settings-shared";
 
 export const metadata: Metadata = { title: "Edit product" };
 
@@ -21,6 +23,10 @@ export default async function EditProductPage({ params }: { params: Promise<{ id
     getSettings(),
   ]);
   if (!product) notFound();
+  const translations = await query<{ locale: TranslationLocale; name: string; description: string; features: string[] }>(
+    "SELECT locale, name, description, features FROM product_translations WHERE product_id = $1",
+    [product.id],
+  );
 
   return (
     <>
@@ -61,6 +67,9 @@ export default async function EditProductPage({ params }: { params: Promise<{ id
           icon: product.icon,
           iconColor: product.iconColor,
           imageUrl: product.imageUrl,
+          translations: Object.fromEntries(
+            translations.map((row) => [row.locale, { name: row.name, description: row.description, features: row.features.join("\n") }]),
+          ),
           price: centsToInput(product.priceCents),
           compareAt: centsToInput(product.compareAtCents),
           features: product.features.join("\n"),

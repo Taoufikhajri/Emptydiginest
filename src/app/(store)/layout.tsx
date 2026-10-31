@@ -6,14 +6,14 @@ import { SiteFooter } from "@/components/store/site-footer";
 import { SiteHeader } from "@/components/store/site-header";
 import { getCurrentUser } from "@/lib/auth";
 import { locales } from "@/lib/i18n/locales";
+import { getCategoryLocalizer, getLocalizedSettings } from "@/lib/i18n/localize";
 import { getI18n } from "@/lib/i18n/server";
 import { getCategories } from "@/lib/queries";
 import { currencies } from "@/lib/settings-shared";
 import { getPricing } from "@/lib/pricing";
-import { getSettings } from "@/lib/settings";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const settings = await getSettings();
+  const settings = await getLocalizedSettings();
   return {
     title: {
       default: settings.tagline ? `${settings.storeName} | ${settings.tagline}` : settings.storeName,
@@ -28,11 +28,12 @@ export default async function StoreLayout({ children }: { children: React.ReactN
   const [categories, user, settings, pricing, i18n] = await Promise.all([
     getCategories(),
     getCurrentUser(),
-    getSettings(),
+    getLocalizedSettings(),
     getPricing(),
     getI18n(),
   ]);
-  const navCategories = categories.map(({ slug, name }) => ({ slug, name }));
+  const localizeCategory = await getCategoryLocalizer();
+  const navCategories = categories.map(({ slug, name }) => localizeCategory({ slug, name }));
   const brand = { name: settings.storeName, logoUrl: settings.logoUrl, showName: settings.showNameWithLogo || !settings.logoUrl };
 
   return (

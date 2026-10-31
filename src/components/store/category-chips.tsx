@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getCategoryLocalizer } from "@/lib/i18n/localize";
 import { getI18n } from "@/lib/i18n/server";
 import type { Category } from "@/lib/queries";
 import { cn } from "@/lib/utils";
@@ -10,13 +11,13 @@ type CategoryChipsProps = {
 };
 
 export async function CategoryChips({ categories, activeSlug, totalCount }: CategoryChipsProps) {
-  const { t } = await getI18n();
+  const [{ t }, localize] = await Promise.all([getI18n(), getCategoryLocalizer()]);
   const chips = [
     { slug: undefined, href: "/products", label: t("catalog.all"), count: totalCount },
     ...categories.map((category) => ({
       slug: category.slug,
       href: `/categories/${category.slug}`,
-      label: category.name,
+      label: localize(category).name,
       count: category.productCount,
     })),
   ];

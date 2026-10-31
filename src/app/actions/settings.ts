@@ -14,6 +14,9 @@ import {
   luminance,
   saveLogo,
   saveSettings,
+  translatableFields,
+  translationLocales,
+  type SettingsTranslations,
   type StoreSettings,
 } from "@/lib/settings";
 import { checkImageUpload, readImageUpload } from "@/lib/images";
@@ -80,8 +83,20 @@ export async function updateSettings(_state: AdminFormState, formData: FormData)
   const heroCards = heroCardsSchema.safeParse(rawHeroCards);
   if (!heroCards.success) return { error: heroCards.error.issues[0].message };
 
+  // Translation inputs are named tr-<locale>-<field>; empty ones are left out so the English text shows.
+  const translations: SettingsTranslations = {};
+  for (const { code } of translationLocales) {
+    const fields = Object.fromEntries(
+      translatableFields
+        .map((field) => [field, String(formData.get(`tr-${code}-${field}`) ?? "").trim().slice(0, 300)])
+        .filter(([, value]) => value),
+    );
+    if (Object.keys(fields).length > 0) translations[code] = fields;
+  }
+
   const settings: StoreSettings = {
     ...parsed.data,
+    translations,
     heroCards: heroCards.data,
     binanceUsdtRate: parsed.data.binanceUsdtRate.replace(",", "."),
     primaryColor: parsed.data.primaryColor.toLowerCase(),

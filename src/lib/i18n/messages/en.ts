@@ -36,6 +36,11 @@ export const en = {
   "hero.showCard": "Show card {number}",
   "hero.introTitle": "{count} tools for makers and creators",
   "hero.introDetail": "Delivered automatically",
+  "hero.defaultLead": "Tools for makers,",
+  "hero.defaultAccent": "delivered instantly.",
+  "hero.defaultSubtitle": "Most orders arrive within seconds, on the order page and by email.",
+  "site.defaultTagline": "Digital tools for makers, delivered instantly",
+  "site.defaultDescription": "Software, templates and creative tools for makers, delivered by email in seconds.",
 
   "home.popular": "Popular right now",
   "home.byCategory": "Browse by category",

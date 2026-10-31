@@ -17,12 +17,12 @@ export const localeInfo = (code: Locale) => locales.find((locale) => locale.code
 
 const countryLocale: Record<string, Locale> = {
   ...Object.fromEntries(
-    ["FR", "BE", "LU", "MC", "MA", "DZ", "TN", "SN", "CI", "CM", "ML", "BF", "NE", "TG", "BJ", "GA", "CG", "CD", "MG", "HT"].map(
+    ["FR", "BE", "LU", "MC", "MA", "DZ", "SN", "CI", "CM", "ML", "BF", "NE", "TG", "BJ", "GA", "CG", "CD", "MG", "HT"].map(
       (country) => [country, "fr" as const],
     ),
   ),
   ...Object.fromEntries(
-    ["SA", "AE", "EG", "QA", "KW", "BH", "OM", "JO", "LB", "IQ", "LY", "SD", "YE", "SY", "PS", "MR"].map((country) => [country, "ar" as const]),
+    ["TN", "SA", "AE", "EG", "QA", "KW", "BH", "OM", "JO", "LB", "IQ", "LY", "SD", "YE", "SY", "PS", "MR"].map((country) => [country, "ar" as const]),
   ),
   ...Object.fromEntries(
     ["ES", "MX", "AR", "CO", "CL", "PE", "VE", "EC", "UY", "PY", "BO", "CR", "PA", "DO", "GT", "HN", "NI", "SV", "CU"].map(

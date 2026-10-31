@@ -138,6 +138,15 @@ const schema = [
     data TEXT NOT NULL,
     updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
   )`,
+  // Admin-written translations of a product; empty fields fall back to the English text.
+  `CREATE TABLE IF NOT EXISTS product_translations (
+    product_id INTEGER NOT NULL REFERENCES products(id) ON DELETE CASCADE,
+    locale TEXT NOT NULL,
+    name TEXT NOT NULL DEFAULT '',
+    description TEXT NOT NULL DEFAULT '',
+    features JSONB NOT NULL DEFAULT '[]'::jsonb,
+    PRIMARY KEY (product_id, locale)
+  )`,
   // A single row (id = 1): settings JSON plus the uploaded logo, stored as base64.
   `CREATE TABLE IF NOT EXISTS store_settings (
     id INTEGER PRIMARY KEY CHECK (id = 1),

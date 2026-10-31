@@ -36,6 +36,11 @@ export const fr: Messages = {
   "hero.showCard": "Afficher la carte {number}",
   "hero.introTitle": "{count} outils pour les créateurs",
   "hero.introDetail": "Livraison automatique",
+  "hero.defaultLead": "Des outils pour créer,",
+  "hero.defaultAccent": "livrés instantanément.",
+  "hero.defaultSubtitle": "La plupart des commandes arrivent en quelques secondes, sur la page de commande et par e-mail.",
+  "site.defaultTagline": "Outils numériques pour créateurs, livrés instantanément",
+  "site.defaultDescription": "Logiciels, modèles et outils créatifs, livrés par e-mail en quelques secondes.",
 
   "home.popular": "Populaires en ce moment",
   "home.byCategory": "Parcourir par catégorie",

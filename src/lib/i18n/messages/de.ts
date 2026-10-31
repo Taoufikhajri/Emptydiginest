@@ -36,6 +36,11 @@ export const de: Messages = {
   "hero.showCard": "Karte {number} anzeigen",
   "hero.introTitle": "{count} Tools für Kreative",
   "hero.introDetail": "Automatische Lieferung",
+  "hero.defaultLead": "Tools für Kreative,",
+  "hero.defaultAccent": "sofort geliefert.",
+  "hero.defaultSubtitle": "Die meisten Bestellungen kommen in Sekunden an – auf der Bestellseite und per E-Mail.",
+  "site.defaultTagline": "Digitale Tools für Kreative, sofort geliefert",
+  "site.defaultDescription": "Software, Vorlagen und kreative Tools, in Sekunden per E-Mail geliefert.",
 
   "home.popular": "Gerade beliebt",
   "home.byCategory": "Nach Kategorie entdecken",

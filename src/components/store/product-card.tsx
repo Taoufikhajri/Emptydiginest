@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Check } from "lucide-react";
 import { ProductVisual } from "@/components/product-visual";
+import { getProductLocalizer } from "@/lib/i18n/localize";
 import { getI18n } from "@/lib/i18n/server";
 import { DynamicIcon } from "@/lib/icons";
 import { formatShopPrice, type Pricing } from "@/lib/currency";
@@ -89,11 +90,12 @@ export async function ProductCard({ product, pricing }: { product: Product; pric
   );
 }
 
-export function ProductGrid({ products, pricing }: { products: Product[]; pricing: Pricing }) {
+export async function ProductGrid({ products, pricing }: { products: Product[]; pricing: Pricing }) {
+  const localize = await getProductLocalizer();
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
       {products.map((product) => (
-        <ProductCard key={product.id} product={product} pricing={pricing} />
+        <ProductCard key={product.id} product={localize(product)} pricing={pricing} />
       ))}
     </div>
   );

@@ -59,6 +59,7 @@ export const MAX_HERO_CARDS = 6;
 
 export const homeSections = [
   { id: "hero", label: "Hero", hint: "Big headline with the rotating product cards" },
+  { id: "intro", label: "Intro animation", hint: "Short animated walkthrough over the hero, once per visit" },
   { id: "guarantee", label: "Guarantee & payment methods", hint: "\"Replaced or refunded\" block and the Pay with badges" },
   { id: "categories", label: "Category shortcuts", hint: "Category chips above the product grid" },
   { id: "popular", label: "Popular products", hint: "Grid of featured products" },
@@ -125,7 +126,7 @@ export const defaultSettings: StoreSettings = {
   localCurrency: true,
   binanceUsdtRate: "",
   announcement: "",
-  sections: { hero: true, guarantee: true, categories: true, popular: true },
+  sections: { hero: true, intro: true, guarantee: true, categories: true, popular: true },
   heroTitleLead: "Tools for makers,",
   heroTitleAccent: "delivered instantly.",
   heroSubtitle: "Most orders arrive within seconds, on the order page and by email.",

@@ -181,3 +181,22 @@
     animation: none;
   }
 }
+
+/* Hero intro: floating icon tiles and the typing caret. */
+@keyframes intro-float {
+  0%,
+  100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+.intro-float {
+  animation: intro-float 3.6s ease-in-out infinite;
+}
+
+@keyframes intro-caret {
+  50% { opacity: 0; }
+}
+
+.intro-caret {
+  animation: intro-caret 1s steps(1) infinite;
+}

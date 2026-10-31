@@ -25,6 +25,8 @@ export default async function HomePage() {
   const [pricing, { t }] = await Promise.all([getPricing(), getI18n()]);
   const { sections } = settings;
   const showcase = featured.length > 0 ? featured : all.slice(0, 8);
+  // The intro's checkout demo uses the first product shown on the home page.
+  const introProduct = showcase[0];
 
   // Cards chosen in admin Settings; hidden or deleted products are skipped.
   const chosenSlides = settings.heroCards.flatMap((card, index): HeroSlide[] => {
@@ -85,6 +87,19 @@ export default async function HomePage() {
       {sections.hero ? (
         <Hero
           slides={slides}
+          intro={
+            sections.intro
+              ? {
+                  storeName: settings.storeName,
+                  logoUrl: settings.logoUrl,
+                  tagline: settings.tagline,
+                  titleLead: settings.heroTitleLead,
+                  titleAccent: settings.heroTitleAccent,
+                  productName: introProduct?.name ?? t("hero.introTitle", { count: all.length }),
+                  productPrice: introProduct ? formatShopPrice(introProduct.priceCents, pricing) : "",
+                }
+              : null
+          }
           content={{
             storeName: settings.storeName,
             titleLead: settings.heroTitleLead,

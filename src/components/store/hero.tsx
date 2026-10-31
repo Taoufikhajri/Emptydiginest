@@ -8,6 +8,7 @@ import type { HeroCardStyle } from "@/lib/settings-shared";
 import { cn } from "@/lib/utils";
 import { useI18n } from "@/components/i18n-provider";
 import { useCart, type CartItem } from "./cart-provider";
+import { HeroIntro, type HeroIntroContent } from "./hero-intro";
 
 export type HeroSlide = {
   key: string;
@@ -48,13 +49,38 @@ const stackTransforms = [
   "translate(8%, -13%) rotate(-10deg)",
 ];
 
-export function Hero({ slides, content }: { slides: HeroSlide[]; content: HeroContent }) {
+const INTRO_SEEN_KEY = "dn_intro_seen";
+
+export function Hero({ slides, content, intro }: { slides: HeroSlide[]; content: HeroContent; intro: HeroIntroContent | null }) {
   const router = useRouter();
   const { add } = useCart();
   const { t } = useI18n();
   const [active, setActive] = useState(0);
   const [paused, setPaused] = useState(false);
   const [introKey, setIntroKey] = useState(0);
+  // The intro covers the hero on first render; it is dropped right away for repeat visits in the same
+  // session and for visitors who prefer reduced motion.
+  const [showIntro, setShowIntro] = useState(Boolean(intro));
+  const [introRun, setIntroRun] = useState(0);
+
+  useEffect(() => {
+    if (!intro) return;
+    let seen = false;
+    try {
+      seen = sessionStorage.getItem(INTRO_SEEN_KEY) === "1";
+    } catch {}
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- reading browser-only preferences after hydration
+    if (seen || window.matchMedia("(prefers-reduced-motion: reduce)").matches) setShowIntro(false);
+  }, [intro]);
+
+  const finishIntro = useCallback(() => {
+    try {
+      sessionStorage.setItem(INTRO_SEEN_KEY, "1");
+    } catch {}
+    setShowIntro(false);
+    setIntroKey((key) => key + 1);
+    setActive(0);
+  }, []);
 
   const go = useCallback(
     (delta: number) => setActive((current) => (current + delta + slides.length) % slides.length),
@@ -68,7 +94,8 @@ export function Hero({ slides, content }: { slides: HeroSlide[]; content: HeroCo
   }, [go, paused, slides.length]);
 
   return (
-    <section className="overflow-x-clip bg-background">
+    <section className="relative overflow-x-clip bg-background">
+      {intro && showIntro && <HeroIntro key={introRun} content={intro} onDone={finishIntro} />}
       <div className="mx-auto grid min-h-[calc(100svh-64px)] max-w-7xl grid-cols-1 items-center gap-10 px-4 py-12 sm:px-6 lg:grid-cols-[1fr_1fr] lg:gap-8 lg:px-8 lg:py-0">
         <div key={introKey} className="order-2 text-center lg:order-1 lg:text-start">
           <h1 className="animate-in fade-in slide-in-from-bottom-3 text-[34px] leading-[1.05] font-semibold tracking-[-0.03em] text-balance text-foreground duration-700 sm:text-4xl lg:text-6xl">
@@ -88,8 +115,14 @@ export function Hero({ slides, content }: { slides: HeroSlide[]; content: HeroCo
             <button
               type="button"
               onClick={() => {
-                setIntroKey((key) => key + 1);
-                setActive(0);
+                if (intro) {
+                  window.scrollTo({ top: 0 });
+                  setIntroRun((run) => run + 1);
+                  setShowIntro(true);
+                } else {
+                  setIntroKey((key) => key + 1);
+                  setActive(0);
+                }
               }}
               className="inline-flex h-10 items-center gap-1.5 rounded-full px-1.5 text-sm font-semibold text-muted-foreground hover:text-foreground"
             >

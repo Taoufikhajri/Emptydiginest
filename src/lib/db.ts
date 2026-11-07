@@ -84,6 +84,12 @@ const schema = [
     user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     expires_at TIMESTAMPTZ NOT NULL
   )`,
+  `CREATE TABLE IF NOT EXISTS password_resets (
+    token_hash TEXT PRIMARY KEY,
+    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    expires_at TIMESTAMPTZ NOT NULL
+  )`,
   `CREATE TABLE IF NOT EXISTS categories (
     id SERIAL PRIMARY KEY,
     slug TEXT NOT NULL UNIQUE,

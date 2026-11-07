@@ -55,7 +55,8 @@ The embedded local database does **not** work on Vercel or Railway. Always set `
 | --- | --- | --- |
 | `DATABASE_URL` | Yes | Postgres connection string |
 | `DATABASE_SSL` | Neon / most managed hosts | `true` |
-| `APP_URL` | Yes | Public site URL, used for payment returns and webhooks |
+| `APP_URL` | Yes | Public site URL, used for payment returns, webhooks and password reset links |
+| `RESEND_API_KEY`, `EMAIL_FROM` | For "Forgot password" | API key from resend.com and a sender on a domain verified there, e.g. `Diginest <no-reply@yourdomain.com>`. Without them, no reset emails go out. `APP_URL` must be set too |
 | `ADMIN_EMAIL`, `ADMIN_PASSWORD` | First deploy | Creates the first admin if none exists |
 | `NOWPAYMENTS_API_KEY`, `NOWPAYMENTS_IPN_SECRET` | To accept NOWPayments | From the NOWPayments dashboard. Set the IPN callback URL there to `APP_URL/api/webhooks/nowpayments` |
 | `NOWPAYMENTS_SANDBOX` | Optional | `true` to test with sandbox keys |
